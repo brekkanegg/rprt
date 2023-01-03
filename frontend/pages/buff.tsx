@@ -92,7 +92,7 @@ const NftIndex: NextPage = () => {
         title: 'Transaction Successful',
         description: (
           <>
-            <Text>Successfully minted your NFT!</Text>
+            <Text>Successfully dropped your BUFF NFT!</Text>
             <Text>
               <Link
                 href={`https://mumbai.polygonscan.io/tx/${data?.blockHash}`}
@@ -203,7 +203,9 @@ const NftIndex: NextPage = () => {
         </Text>
         <Divider my="8" borderColor="gray.400" />
         <VStack shouldWrapChildren>
-          <Text textAlign="center" mb="12px">⌚ Time Interval (sec) </Text>
+          <Text textAlign="center" mb="12px">
+            ⌚ Time Interval (sec){' '}
+          </Text>
           <NumberInput
             // value={timeInterval}
             isDisabled={!address || isLoading}
@@ -219,8 +221,10 @@ const NftIndex: NextPage = () => {
               <NumberIncrementStepper />
               <NumberDecrementStepper />
             </NumberInputStepper>
-          </NumberInput >
-          <Text textAlign="center" mb="12px">🌍 Distance Interval (meter) </Text>
+          </NumberInput>
+          <Text textAlign="center" mb="12px">
+            🌍 Distance Interval (meter){' '}
+          </Text>
           <NumberInput
             // value={timeInterval}
             isDisabled={!address || isLoading}

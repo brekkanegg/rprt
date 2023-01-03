@@ -102,7 +102,7 @@ const Home: NextPage = () => {
         title: 'Transaction Successful',
         description: (
           <>
-            <Text>Successfully updated the Greeting!</Text>
+            <Text>Successfully minted your Location NFT!</Text>
             <Text>
               <Link
                 href={`https://mumbai.polygonscan.com/tx/${data?.blockHash}`}
