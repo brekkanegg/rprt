@@ -13,7 +13,7 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Stack,
+  VStack,
   useToast,
 } from '@chakra-ui/react'
 import { create } from 'ipfs-http-client'
@@ -202,8 +202,8 @@ const NftIndex: NextPage = () => {
           Contract Address: {CONTRACT_ADDRESS}
         </Text>
         <Divider my="8" borderColor="gray.400" />
-        <Stack shouldWrapChildren direction="row">
-          <Text mb="12px">⌚ Time Interval (sec) </Text>
+        <VStack shouldWrapChildren>
+          <Text textAlign="center" mb="12px">⌚ Time Interval (sec) </Text>
           <NumberInput
             // value={timeInterval}
             isDisabled={!address || isLoading}
@@ -219,8 +219,8 @@ const NftIndex: NextPage = () => {
               <NumberIncrementStepper />
               <NumberDecrementStepper />
             </NumberInputStepper>
-          </NumberInput>
-          <Text mb="12px">⌚ Distance Interval (meter) </Text>
+          </NumberInput >
+          <Text textAlign="center" mb="12px">🌍 Distance Interval (meter) </Text>
           <NumberInput
             // value={timeInterval}
             isDisabled={!address || isLoading}
@@ -237,19 +237,7 @@ const NftIndex: NextPage = () => {
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
-        </Stack>
-
-        <InputGroup>
-          <InputLeftElement pointerEvents="none" children="🌍" />
-          <Input
-            type="number"
-            placeholder="Give buff between distance interval: (meters)"
-            isDisabled={!address || isLoading}
-            onChange={(e) => {
-              setDistInterval(Number(e.target.value))
-            }}
-          />
-        </InputGroup>
+        </VStack>
         <Text textAlign="center">
           <Button
             colorScheme="teal"
