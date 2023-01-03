@@ -8,6 +8,12 @@ import {
   InputGroup,
   InputLeftElement,
   Input,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Stack,
   useToast,
 } from '@chakra-ui/react'
 import { create } from 'ipfs-http-client'
@@ -170,7 +176,7 @@ const NftIndex: NextPage = () => {
     } catch (error) {
       console.log('error', error)
     }
-  }, [])
+  }, [timeInterval, distInterval])
 
   useEffect(() => {
     if (hasWhitelist && write) {
@@ -196,18 +202,43 @@ const NftIndex: NextPage = () => {
           Contract Address: {CONTRACT_ADDRESS}
         </Text>
         <Divider my="8" borderColor="gray.400" />
-        {/* <Text mb='8px'>⌚ BUFF Time Interval: </Text> */}
-        <InputGroup>
-          <InputLeftElement pointerEvents="none" children="⌚" />
-          <Input
-            type="number"
-            placeholder="Give buff between time interval: (seconds)"
+        <Stack shouldWrapChildren direction="row">
+          <Text mb="12px">⌚ Time Interval (sec) </Text>
+          <NumberInput
+            // value={timeInterval}
             isDisabled={!address || isLoading}
-            onChange={(e) => {
-              setTimeInterval(Number(e.target.value))
-            }}
-          />
-        </InputGroup>
+            onChange={(value) => setTimeInterval(Number(value))}
+            size="md"
+            maxW={40}
+            defaultValue={300}
+            // min={100}
+            step={100}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Text mb="12px">⌚ Distance Interval (meter) </Text>
+          <NumberInput
+            // value={timeInterval}
+            isDisabled={!address || isLoading}
+            onChange={(value) => setDistInterval(Number(value))}
+            size="md"
+            maxW={40}
+            defaultValue={100}
+            // min={100}
+            step={100}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </Stack>
+
         <InputGroup>
           <InputLeftElement pointerEvents="none" children="🌍" />
           <Input
