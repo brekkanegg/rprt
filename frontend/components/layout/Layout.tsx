@@ -54,8 +54,8 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
       <footer>
         <Container mt="8" py="8" maxWidth="container.xl">
           <Text mb="4">
-            Built by{' '}
-            <Link href="https://twitter.com/brekkanegg">Brekkanegg</Link>
+            Copyright © 2023 Dallo, Inc. All rights reserved. 
+            {/* <Link href="https://twitter.com/brekkanegg">brekkanegg</Link> */}
           </Text>
           {/* <LocalFaucetButton /> */}
         </Container>

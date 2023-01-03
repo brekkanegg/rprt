@@ -5,6 +5,9 @@ import {
   Heading,
   Link,
   Text,
+  InputGroup,
+  InputLeftElement,
+  Input,
   useToast,
 } from '@chakra-ui/react'
 import { create } from 'ipfs-http-client'
@@ -19,49 +22,39 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi'
-import { BuffNFT as LOCAL_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
-// `YourNFT.js` was made manually from `YourNFT.json`, since wagmi hooks require a `const` for the `abi` input.
-// If you update the `YourNFT` contract, be sure to update this `YourNFT.js` file as well.
-// Simply copy the array from `abi: []` found in `YourNFT.json`.
-import { abi as NFT_ABI } from '../artifacts/contracts/BuffNFT.sol/BuffNFT.json'
+import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
+import { BuffNFT as MUMBAI_BUFF_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
+import NFTJson from '../artifacts/contracts/BuffNFT.sol/BuffNFT.json'
 import { Layout } from '../components/layout/Layout'
 import { NftList } from '../components/NftList'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
 import { generateTokenUri } from '../utils/generateTokenUri'
+import { getCurrentPosition } from '../utils/getCurrentPosition'
+import { calcDistanceFromLatLonInMeters } from '../utils/calcDistanceFromLatLon'
 
-const GOERLI_CONTRACT_ADDRESS = '0x982659f8ce3988096A735044aD42445D6514ba7e'
-
-const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
-
-const IPFS_BASE_URL = 'https://ipfs.io/ipfs'
-
-const projectId = '2DDHiA47zFkJXtnxzl2jFkyuaoq'
-const projectSecret = '96a91eeafc0a390ab66e6a87f61152aa'
-const projectIdAndSecret = `${projectId}:${projectSecret}`
-
-const ipfs = create({
-  host: 'ipfs.infura.io',
-  port: 5001,
-  protocol: 'https',
-  headers: {
-    authorization: `Basic ${Buffer.from(projectIdAndSecret).toString(
-      'base64'
-    )}`,
-  },
-})
+// FIXME: Find way to use wagmi instead
+const { Alchemy, Network } = require('alchemy-sdk')
+const settings = {
+  apiKey: process.env.NEXT_PUBLIC_MUMBAI_ALCHEMY_APIKEY,
+  network: Network.MATIC_MUMBAI,
+}
+const alchemy = new Alchemy(settings)
 
 const NftIndex: NextPage = () => {
-  const [hasNftUri, setHasNftUri] = useState(false)
-  const nftUriRef = useRef('')
+  const [hasWhitelist, setHasWhitelist] = useState(false)
+  const whitelistRef = useRef(new Array<string>())
+
+  const [distInterval, setDistInterval] = useState(100)
+  const [timeInterval, setTimeInterval] = useState(300)
 
   const { isLocalChain } = useCheckLocalChain()
 
   const { isMounted } = useIsMounted()
 
   const CONTRACT_ADDRESS = isLocalChain
-    ? LOCAL_CONTRACT_ADDRESS
-    : GOERLI_CONTRACT_ADDRESS
+    ? MUMBAI_BUFF_NFT_ADDRESS //LOCAL_CONTRACT_ADDRESS
+    : MUMBAI_BUFF_NFT_ADDRESS
 
   const { address } = useAccount()
 
@@ -70,74 +63,15 @@ const NftIndex: NextPage = () => {
   const CONTRACT_CONFIG = useMemo(() => {
     return {
       address: CONTRACT_ADDRESS,
-      abi: NFT_ABI,
+      abi: NFTJson.abi,
     }
   }, [CONTRACT_ADDRESS])
 
-  // Gets the total number of NFTs owned by the connected address.
-  const { data: nftBalanceData, refetch: refetchNftBalanceData } =
-    useContractRead({
-      address: CONTRACT_ADDRESS,
-      abi: erc721ABI,
-      functionName: 'balanceOf',
-      args: address ? [address] : undefined,
-    })
-
-  // Creates the contracts array for `nftTokenIds`
-  const tokenOwnerContractsArray = useMemo(() => {
-    let contractCalls = []
-
-    if (nftBalanceData && nftBalanceData.toNumber) {
-      const nftBalance = nftBalanceData.toNumber()
-
-      for (let tokenIndex = 0; tokenIndex < nftBalance; tokenIndex++) {
-        const contractObj = {
-          ...CONTRACT_CONFIG,
-          functionName: 'tokenOfOwnerByIndex',
-          args: [address, tokenIndex],
-        }
-
-        contractCalls.push(contractObj)
-      }
-    }
-
-    return contractCalls
-  }, [CONTRACT_CONFIG, address, nftBalanceData])
-
-  // Gets all of the NFT tokenIds owned by the connected address.
-  const { data: nftTokenIds } = useContractReads({
-    contracts: tokenOwnerContractsArray,
-    enabled: tokenOwnerContractsArray.length > 0,
-  })
-
-  // Creates the contracts array for `nftTokenUris`
-  const tokenUriContractsArray = useMemo(() => {
-    if (!nftTokenIds || nftTokenIds.length === 0) {
-      return []
-    }
-
-    const contractCalls = nftTokenIds?.map((tokenId) => {
-      return {
-        ...CONTRACT_CONFIG,
-        functionName: 'tokenURI',
-        args: tokenId ? [tokenId] : undefined,
-      }
-    })
-
-    return contractCalls
-  }, [CONTRACT_CONFIG, nftTokenIds])
-
-  // Gets all of the NFT tokenUris owned by the connected address.
-  const { data: nftTokenUris } = useContractReads({
-    contracts: tokenUriContractsArray,
-    enabled: tokenUriContractsArray.length > 0,
-  })
-
-  const { config, isFetched } = usePrepareContractWrite({
+  const { config } = usePrepareContractWrite({
     ...CONTRACT_CONFIG,
-    functionName: 'safeMint',
-    args: [address, nftUriRef.current],
-    enabled: hasNftUri,
+    functionName: 'airdropNFTs',
+    args: [whitelistRef.current],
+    enabled: hasWhitelist,
   })
 
   const { data, write } = useContractWrite(config)
@@ -146,8 +80,8 @@ const NftIndex: NextPage = () => {
     hash: data?.hash,
     onSuccess(data) {
       console.log('success data', data)
-      setHasNftUri(false)
-      nftUriRef.current = ''
+      setHasWhitelist(false)
+      whitelistRef.current = new Array<string>()
       toast({
         title: 'Transaction Successful',
         description: (
@@ -155,10 +89,10 @@ const NftIndex: NextPage = () => {
             <Text>Successfully minted your NFT!</Text>
             <Text>
               <Link
-                href={`https://goerli.etherscan.io/tx/${data?.blockHash}`}
+                href={`https://mumbai.polygonscan.io/tx/${data?.blockHash}`}
                 isExternal
               >
-                View on Etherscan
+                View on Polygonscan
               </Link>
             </Text>
           </>
@@ -167,48 +101,83 @@ const NftIndex: NextPage = () => {
         duration: 5000,
         isClosable: true,
       })
-      refetchNftBalanceData()
+      // refetchNftBalanceData()
     },
   })
 
-  const mintItem = useCallback(async () => {
-    const fetchImage = async () => {
-      const response = await fetch(
-        `https://api.unsplash.com/photos/random/?client_id=${UNSPLASH_ACCESS_KEY}`
-      )
-
-      if (!response.ok) {
-        throw Error('Error with fetch')
+  const dropBuff = useCallback(async () => {
+    const { nfts } = await alchemy.nft.getNftsForContract(
+      MUMBAI_LOCATION_NFT_ADDRESS,
+      {
+        omitMetadata: false,
       }
+    )
+    console.log(nfts)
+    console.log(nfts[0].rawMetadata.attributes[0].value)
 
-      const data = await response.json()
-      return data
-    }
+    const whitelist: string[] = []
+    const rightNow = Date.now()
 
     try {
-      // Fetch a random photo from Unsplash
-      const photos = await fetchImage()
+      const position: any = await getCurrentPosition()
+      console.log(position)
 
-      // Convert that photo into `tokenURI` metadata
-      const tokenURI = generateTokenUri(photos)
+      for (let nft of nfts) {
+        const timeDiff = (rightNow - nft.rawMetadata.attributes[3].value) / 1000 // in Seconds
+        console.log('timediff:', timeDiff)
+        console.log('timeInterval:', timeInterval)
 
-      // Upload the `tokenURI` to IPFS
-      const uploaded = await ipfs.add(tokenURI)
+        if (timeDiff < timeInterval) {
+          const distDiff = calcDistanceFromLatLonInMeters(
+            position.coords.latitude,
+            position.coords.longitude,
+            nft.rawMetadata.attributes[0].value,
+            nft.rawMetadata.attributes[1].value
+          )
+          console.log(distDiff)
+          if (distDiff < distInterval) {
+            // Alchemy API call
+            const { owners } = await alchemy.nft.getOwnersForNft(
+              MUMBAI_LOCATION_NFT_ADDRESS,
+              nft.tokenId
+            )
+            if (!whitelist.includes(owners[0])) {
+              console.log(
+                'Buff target found! ',
+                '\nOwner is: ',
+                owners[0],
+                '\nnft metadata: ',
+                nft.rawMetadata,
+                '\nTime diff (sec): ',
+                timeDiff,
+                '\nDistance diff (meters): ',
+                distDiff
+              )
 
-      // // This will trigger the useEffect to run the `write()` function.
-      setHasNftUri(true)
-      nftUriRef.current = `${IPFS_BASE_URL}/${uploaded.path}`
+              whitelist.push(owners[0])
+            }
+          }
+        }
+      }
+
+      if (whitelist.length > 0) {
+        // This will trigger the useEffect to run the `write()` function.
+        setHasWhitelist(true)
+        whitelistRef.current = whitelist
+      } else {
+        console.log('No target')
+      }
     } catch (error) {
       console.log('error', error)
     }
   }, [])
 
   useEffect(() => {
-    if (hasNftUri && write) {
+    if (hasWhitelist && write) {
       write()
-      setHasNftUri(false)
+      setHasWhitelist(false)
     }
-  }, [hasNftUri, write])
+  }, [hasWhitelist, write])
 
   if (!isMounted) {
     return null
@@ -227,21 +196,44 @@ const NftIndex: NextPage = () => {
           Contract Address: {CONTRACT_ADDRESS}
         </Text>
         <Divider my="8" borderColor="gray.400" />
+        {/* <Text mb='8px'>⌚ BUFF Time Interval: </Text> */}
+        <InputGroup>
+          <InputLeftElement pointerEvents="none" children="⌚" />
+          <Input
+            type="number"
+            placeholder="Give buff between time interval: (seconds)"
+            isDisabled={!address || isLoading}
+            onChange={(e) => {
+              setTimeInterval(Number(e.target.value))
+            }}
+          />
+        </InputGroup>
+        <InputGroup>
+          <InputLeftElement pointerEvents="none" children="🌍" />
+          <Input
+            type="number"
+            placeholder="Give buff between distance interval: (meters)"
+            isDisabled={!address || isLoading}
+            onChange={(e) => {
+              setDistInterval(Number(e.target.value))
+            }}
+          />
+        </InputGroup>
         <Text textAlign="center">
           <Button
             colorScheme="teal"
             size="lg"
             disabled={!address || isLoading}
-            onClick={mintItem}
+            onClick={dropBuff}
             isLoading={isLoading}
           >
-            {address ? 'Spread Buff' : 'Please Connect Your Wallet'}
+            {address ? 'Drop Buff' : 'Please Connect Your Wallet'}
           </Button>
         </Text>
         <Divider my="8" borderColor="gray.400" />
-        {nftTokenUris && (
+        {/* {nftTokenUris && (
           <NftList address={address} ipfs={ipfs} nftTokenUris={nftTokenUris} />
-        )}
+        )} */}
       </Box>
     </Layout>
   )

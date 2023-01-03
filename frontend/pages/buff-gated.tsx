@@ -12,12 +12,12 @@ import type { NextPage } from 'next'
 import NextLink from 'next/link'
 import { useEffect, useState } from 'react'
 import { erc721ABI, useAccount, useContractRead } from 'wagmi'
-import { BuffNFT as LOCAL_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
+import { BuffNFT as MUMBAI_BUFF_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
 import { Layout } from '../components/layout/Layout'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
 
-const GOERLI_CONTRACT_ADDRESS = '0x982659f8ce3988096A735044aD42445D6514ba7e'
+// const GOERLI_CONTRACT_ADDRESS = '0x982659f8ce3988096A735044aD42445D6514ba7e'
 
 const TokenGated: NextPage = () => {
   const { address, isConnected } = useAccount()
@@ -27,8 +27,8 @@ const TokenGated: NextPage = () => {
   const { isMounted } = useIsMounted()
 
   const CONTRACT_ADDRESS = isLocalChain
-    ? LOCAL_CONTRACT_ADDRESS
-    : GOERLI_CONTRACT_ADDRESS
+    ? MUMBAI_BUFF_NFT_ADDRESS //LOCAL_CONTRACT_ADDRESS
+    : MUMBAI_BUFF_NFT_ADDRESS
 
   const [hasNft, setHasNft] = useState(false)
 
@@ -60,20 +60,20 @@ const TokenGated: NextPage = () => {
     <>
       <Text mb="4" fontSize="lg">
         This page will check your authenticated user&apos;s address for a
-        particular NFT.
+        particular BUFF.
       </Text>
       <Text mb="6" fontSize="lg">
         This is checking for the{' '}
         <Link
-          href="https://goerli.etherscan.io/token/0x982659f8ce3988096a735044ad42445d6514ba7e"
+          href={`https://mumbai.polygonscan.com/token/${MUMBAI_BUFF_NFT_ADDRESS}`}
           color="teal.500"
           isExternal
         >
-          CodeBushiToken (CBT)
+          Buff Token (BFT)
         </Link>{' '}
-        on the GOERLI Testnet. You can test this out by{' '}
-        <NextLink href="/nft" passHref>
-          <Link color="teal.500">Minting the NFT</Link>
+        on the POLYGON MUMBAI Testnet. You can test this out by{' '}
+        <NextLink href="/" passHref>
+          <Link color="teal.500">Enter Buff</Link>
         </NextLink>
         .
       </Text>
@@ -141,7 +141,7 @@ const TokenGated: NextPage = () => {
       <Alert status="success">
         <AlertIcon />
         <AlertTitle>Access Granted:</AlertTitle>
-        <AlertDescription>You have the NFT!</AlertDescription>
+        <AlertDescription>You got BUFF!</AlertDescription>
       </Alert>
     </Layout>
   )
