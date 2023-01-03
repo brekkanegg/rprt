@@ -129,10 +129,14 @@ const NftIndex: NextPage = () => {
       console.log(position)
 
       for (let nft of nfts) {
+        console.log(nft.rawMetadata.attributes)
+        if (nft.rawMetadata.attributes.length === 0) {
+          continue
+        }
+
         const timeDiff = (rightNow - nft.rawMetadata.attributes[3].value) / 1000 // in Seconds
         console.log('timediff:', timeDiff)
         console.log('timeInterval:', timeInterval)
-
         if (timeDiff < timeInterval) {
           const distDiff = calcDistanceFromLatLonInMeters(
             position.coords.latitude,
@@ -159,8 +163,7 @@ const NftIndex: NextPage = () => {
                 '\nDistance diff (meters): ',
                 distDiff
               )
-
-              whitelist.push(owners[0])
+              whitelist.push(String(owners[0]))
             }
           }
         }

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 /**
  * Constants & Helpers
  */
-export const WEBSITE_HOST_URL = 'https://nextjs-ethereum-starter.vercel.app/'
+export const WEBSITE_HOST_URL = 'https://right-place-right-time.vercel.app/'
 
 /**
  * Prop Types
@@ -26,7 +26,7 @@ export const Head = ({
 }): JSX.Element => {
   const router = useRouter()
   const meta: MetaProps = {
-    title: 'Next.js Ethereum Starter',
+    title: 'Right Place Right Time Demo',
     description: 'Next.js - RainbowKit - Hardhat',
     image: `${WEBSITE_HOST_URL}/images/site-preview.png`,
     type: 'website',
