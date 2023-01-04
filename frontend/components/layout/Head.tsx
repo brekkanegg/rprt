@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 /**
  * Constants & Helpers
  */
-export const WEBSITE_HOST_URL = 'https://right-place-right-time.vercel.app/'
+export const WEBSITE_HOST_URL = 'https://rprt.vercel.app/'
 
 /**
  * Prop Types
@@ -26,8 +26,8 @@ export const Head = ({
 }): JSX.Element => {
   const router = useRouter()
   const meta: MetaProps = {
-    title: 'Right Place Right Time Demo',
-    description: 'Next.js - RainbowKit - Hardhat',
+    title: 'rprt-demo',
+    description: 'Buff system based on location in web3',
     image: `${WEBSITE_HOST_URL}/images/site-preview.png`,
     type: 'website',
     ...customMeta,

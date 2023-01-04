@@ -3,22 +3,17 @@ import {
   Button,
   Divider,
   Heading,
-  Input,
   Link,
-  ListItem,
   Text,
-  UnorderedList,
   useToast,
 } from '@chakra-ui/react'
 import { create } from 'ipfs-http-client'
-// import { ethers, providers } from 'ethers'
 import type { NextPage } from 'next'
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import {
   useAccount,
   useContractWrite,
   usePrepareContractWrite,
-  // useProvider,
   useWaitForTransaction,
 } from 'wagmi'
 import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
@@ -26,7 +21,6 @@ import NFTJson from '../artifacts/contracts/LocationNFT.sol/LocationNFT.json'
 import { Layout } from '../components/layout/Layout'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
-// import { LocationNFT as LocationNFTType } from '../types/typechain'
 import { generateTokenUri } from '../utils/generateTokenUri'
 import { getCurrentPosition } from '../utils/getCurrentPosition'
 
@@ -105,7 +99,7 @@ const Home: NextPage = () => {
             <Text>Successfully minted your Location NFT!</Text>
             <Text>
               <Link
-                href={`https://mumbai.polygonscan.com/tx/${data?.blockHash}`}
+                href={`https://mumbai.polygonscan.com/tx/${data?.transactionHash}`}
                 isExternal
               >
                 View on Polygonscan
@@ -132,9 +126,9 @@ const Home: NextPage = () => {
       // Upload the `tokenURI` to IPFS
       const uploaded = await ipfs.add(tokenURI)
 
+      nftUriRef.current = `${IPFS_BASE_URL}/${uploaded.path}`
       // // This will trigger the useEffect to run the `write()` function.
       setHasNftUri(true)
-      nftUriRef.current = `${IPFS_BASE_URL}/${uploaded.path}`
       console.log('nfturi: ', nftUriRef.current)
     } catch (error) {
       console.log('error', error)

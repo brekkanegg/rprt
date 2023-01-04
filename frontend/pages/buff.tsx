@@ -5,9 +5,6 @@ import {
   Heading,
   Link,
   Text,
-  InputGroup,
-  InputLeftElement,
-  Input,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
@@ -16,14 +13,10 @@ import {
   VStack,
   useToast,
 } from '@chakra-ui/react'
-import { create } from 'ipfs-http-client'
 import type { NextPage } from 'next'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  erc721ABI,
   useAccount,
-  useContractRead,
-  useContractReads,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -32,10 +25,8 @@ import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contrac
 import { BuffNFT as MUMBAI_BUFF_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
 import NFTJson from '../artifacts/contracts/BuffNFT.sol/BuffNFT.json'
 import { Layout } from '../components/layout/Layout'
-import { NftList } from '../components/NftList'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
-import { generateTokenUri } from '../utils/generateTokenUri'
 import { getCurrentPosition } from '../utils/getCurrentPosition'
 import { calcDistanceFromLatLonInMeters } from '../utils/calcDistanceFromLatLon'
 
@@ -47,7 +38,7 @@ const settings = {
 }
 const alchemy = new Alchemy(settings)
 
-const NftIndex: NextPage = () => {
+const BuffMinter: NextPage = () => {
   const [hasWhitelist, setHasWhitelist] = useState(false)
   const whitelistRef = useRef(new Array<string>())
 
@@ -86,8 +77,8 @@ const NftIndex: NextPage = () => {
     hash: data?.hash,
     onSuccess(data) {
       console.log('success data', data)
-      setHasWhitelist(false)
       whitelistRef.current = new Array<string>()
+      setHasWhitelist(false)
       toast({
         title: 'Transaction Successful',
         description: (
@@ -95,7 +86,7 @@ const NftIndex: NextPage = () => {
             <Text>Successfully dropped your BUFF NFT!</Text>
             <Text>
               <Link
-                href={`https://mumbai.polygonscan.io/tx/${data?.blockHash}`}
+                href={`https://mumbai.polygonscan.com/tx/${data?.transactionHash}`}
                 isExternal
               >
                 View on Polygonscan
@@ -118,25 +109,25 @@ const NftIndex: NextPage = () => {
         omitMetadata: false,
       }
     )
-    console.log(nfts)
-    console.log(nfts[0].rawMetadata.attributes[0].value)
+    // console.log(nfts)
+    // console.log(nfts[0].rawMetadata.attributes[0].value)
 
     const whitelist: string[] = []
     const rightNow = Date.now()
 
     try {
       const position: any = await getCurrentPosition()
-      console.log(position)
+      console.log('current position: ', position)
 
       for (let nft of nfts) {
-        console.log(nft.rawMetadata.attributes)
+        // console.log(nft.rawMetadata.attributes)
         if (nft.rawMetadata.attributes.length === 0) {
           continue
         }
 
         const timeDiff = (rightNow - nft.rawMetadata.attributes[3].value) / 1000 // in Seconds
-        console.log('timediff:', timeDiff)
-        console.log('timeInterval:', timeInterval)
+        // console.log('timediff:', timeDiff)
+        // console.log('timeInterval:', timeInterval)
         if (timeDiff < timeInterval) {
           const distDiff = calcDistanceFromLatLonInMeters(
             position.coords.latitude,
@@ -144,7 +135,8 @@ const NftIndex: NextPage = () => {
             nft.rawMetadata.attributes[0].value,
             nft.rawMetadata.attributes[1].value
           )
-          console.log(distDiff)
+          // console.log('distDiff:', distDiff)
+          // console.log('distInterval:', distInterval)
           if (distDiff < distInterval) {
             // Alchemy API call
             const { owners } = await alchemy.nft.getOwnersForNft(
@@ -170,11 +162,12 @@ const NftIndex: NextPage = () => {
       }
 
       if (whitelist.length > 0) {
+        whitelistRef.current = whitelist
         // This will trigger the useEffect to run the `write()` function.
         setHasWhitelist(true)
-        whitelistRef.current = whitelist
       } else {
-        console.log('No target')
+        console.log("No target to give buff! \nAdjust time or distance interval.",
+        )
       }
     } catch (error) {
       console.log('error', error)
@@ -244,18 +237,18 @@ const NftIndex: NextPage = () => {
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
+          <Text textAlign="center">
+            <Button
+              colorScheme="teal"
+              size="lg"
+              disabled={!address || isLoading}
+              onClick={dropBuff}
+              isLoading={isLoading}
+            >
+              {address ? 'Drop Buff (only-owner)' : 'Please Connect Your Wallet'}
+            </Button>
+          </Text>
         </VStack>
-        <Text textAlign="center">
-          <Button
-            colorScheme="teal"
-            size="lg"
-            disabled={!address || isLoading}
-            onClick={dropBuff}
-            isLoading={isLoading}
-          >
-            {address ? 'Drop Buff' : 'Please Connect Your Wallet'}
-          </Button>
-        </Text>
         <Divider my="8" borderColor="gray.400" />
         {/* {nftTokenUris && (
           <NftList address={address} ipfs={ipfs} nftTokenUris={nftTokenUris} />
@@ -265,4 +258,4 @@ const NftIndex: NextPage = () => {
   )
 }
 
-export default NftIndex
+export default BuffMinter
