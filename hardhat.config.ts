@@ -1,13 +1,13 @@
-import '@nomicfoundation/hardhat-toolbox';
-import { HardhatUserConfig } from 'hardhat/config';
+import "@nomicfoundation/hardhat-toolbox";
+import { HardhatUserConfig } from "hardhat/config";
 
 require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 const config: HardhatUserConfig = {
-  solidity: '0.8.17',
+  solidity: "0.8.9",
   paths: {
-    artifacts: './frontend/artifacts',
+    artifacts: "./frontend/artifacts",
   },
   networks: {
     hardhat: {
@@ -19,7 +19,7 @@ const config: HardhatUserConfig = {
     },
   },
   typechain: {
-    outDir: './frontend/types/typechain',
+    outDir: "./frontend/types/typechain",
   },
 };
 

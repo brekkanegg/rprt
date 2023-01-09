@@ -81,7 +81,7 @@ export const NftList = ({
 
   return (
     <div>
-      <SimpleGrid my="6" columns={[1, 1, 8]} gap="6">
+      <SimpleGrid my="6" columns={[1, 1, 4]} gap="6">
         {nfts.map((nft) => {
           return (
             <Flex
@@ -94,12 +94,15 @@ export const NftList = ({
               borderColor="gray.300"
             >
               <Image
-                boxSize={[15, 15, 30]}
+                boxSize={[50, 50, 100]}
                 objectFit="cover"
                 src={nft.image}
                 alt={nft.name}
               />
               <Box>
+                <Text fontSize="lg" fontWeight="semibold">
+                  Sample BUFF
+                </Text>
                 <Text fontSize="lg" fontWeight="semibold">
                   {nft.name}
                 </Text>

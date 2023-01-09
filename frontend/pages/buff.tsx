@@ -24,6 +24,7 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi'
+import axios from 'axios'
 import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
 import { BuffNFT as MUMBAI_BUFF_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
 import NFTJson from '../artifacts/contracts/BuffNFT.sol/BuffNFT.json'
@@ -203,8 +204,15 @@ const BuffMinter: NextPage = () => {
       const whitelist: string[] = []
       for (let nft of locationNfts) {
         // FIXME: what is this..?
-        if (nft.rawMetadata.attributes.length === 0) {
-          continue
+        if (
+          nft.metadataError &&
+          nft.metadataError === 'IPFS gateway timed out'
+        ) {
+          console.log('Refetching metadata...', nft)
+          const metadata = await axios(nft.tokenUri.raw)
+            .then((response) => response.data)
+            .catch((error) => console.log(error))
+          nft.rawMetadata = metadata
         }
 
         const nftLatitude = nft.rawMetadata.attributes[0].value
@@ -251,6 +259,7 @@ const BuffMinter: NextPage = () => {
         MUMBAI_LOCATION_NFT_ADDRESS,
         {
           omitMetadata: false,
+          // tokenUriTimeoutInMs: 10000,
         }
       )
 
@@ -338,9 +347,9 @@ const BuffMinter: NextPage = () => {
             onChange={(value) => setDistRadius(Number(value))}
             size="md"
             maxW={40}
-            defaultValue={100}
+            defaultValue={1000}
             // min={100}
-            step={100}
+            step={1000}
           >
             <NumberInputField />
             <NumberInputStepper>
