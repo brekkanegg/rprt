@@ -40,12 +40,12 @@ export const Head = ({
       <meta property="og:url" content={`${WEBSITE_HOST_URL}${router.asPath}`} />
       <link rel="canonical" href={`${WEBSITE_HOST_URL}${router.asPath}`} />
       <meta property="og:type" content={meta.type} />
-      <meta property="og:site_name" content="Next.js Ethereum Starter" />
+      <meta property="og:site_name" content="rprt-demo" />
       <meta property="og:description" content={meta.description} />
       <meta property="og:title" content={meta.title} />
       <meta property="og:image" content={meta.image} />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@huntarosan" />
+      <meta name="twitter:site" content="@DALLO_NFT" />
       <meta name="twitter:title" content={meta.title} />
       <meta name="twitter:description" content={meta.description} />
       <meta name="twitter:image" content={meta.image} />

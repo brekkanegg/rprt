@@ -29,11 +29,10 @@ import type {
 
 export interface BuffNFTInterface extends utils.Interface {
   functions: {
-    "airdropNFTs(address[])": FunctionFragment;
+    "airdropNFTs(address[],string[])": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "isAllowlistAddress(address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -55,7 +54,6 @@ export interface BuffNFTInterface extends utils.Interface {
       | "approve"
       | "balanceOf"
       | "getApproved"
-      | "isAllowlistAddress"
       | "isApprovedForAll"
       | "name"
       | "owner"
@@ -73,7 +71,7 @@ export interface BuffNFTInterface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "airdropNFTs",
-    values: [PromiseOrValue<string>[]]
+    values: [PromiseOrValue<string>[], PromiseOrValue<string>[]]
   ): string;
   encodeFunctionData(
     functionFragment: "approve",
@@ -86,10 +84,6 @@ export interface BuffNFTInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isAllowlistAddress",
-    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -156,10 +150,6 @@ export interface BuffNFTInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isAllowlistAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -290,6 +280,7 @@ export interface BuffNFT extends BaseContract {
   functions: {
     airdropNFTs(
       wAddresses: PromiseOrValue<string>[],
+      tokenUris: PromiseOrValue<string>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -308,11 +299,6 @@ export interface BuffNFT extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    isAllowlistAddress(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
 
     isApprovedForAll(
       owner: PromiseOrValue<string>,
@@ -381,6 +367,7 @@ export interface BuffNFT extends BaseContract {
 
   airdropNFTs(
     wAddresses: PromiseOrValue<string>[],
+    tokenUris: PromiseOrValue<string>[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -399,11 +386,6 @@ export interface BuffNFT extends BaseContract {
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
-
-  isAllowlistAddress(
-    arg0: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
 
   isApprovedForAll(
     owner: PromiseOrValue<string>,
@@ -472,6 +454,7 @@ export interface BuffNFT extends BaseContract {
   callStatic: {
     airdropNFTs(
       wAddresses: PromiseOrValue<string>[],
+      tokenUris: PromiseOrValue<string>[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -490,11 +473,6 @@ export interface BuffNFT extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    isAllowlistAddress(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
 
     isApprovedForAll(
       owner: PromiseOrValue<string>,
@@ -606,6 +584,7 @@ export interface BuffNFT extends BaseContract {
   estimateGas: {
     airdropNFTs(
       wAddresses: PromiseOrValue<string>[],
+      tokenUris: PromiseOrValue<string>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -622,11 +601,6 @@ export interface BuffNFT extends BaseContract {
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isAllowlistAddress(
-      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -698,6 +672,7 @@ export interface BuffNFT extends BaseContract {
   populateTransaction: {
     airdropNFTs(
       wAddresses: PromiseOrValue<string>[],
+      tokenUris: PromiseOrValue<string>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -714,11 +689,6 @@ export interface BuffNFT extends BaseContract {
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isAllowlistAddress(
-      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

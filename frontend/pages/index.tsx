@@ -17,13 +17,14 @@ import {
   useWaitForTransaction,
 } from 'wagmi'
 import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
+// import NFTJson from '../artifacts/contracts/LocationNFT.sol/LocationNFT.json'
 import NFTJson from '../artifacts/contracts/LocationNFT.sol/LocationNFT.json'
 import { Layout } from '../components/layout/Layout'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
-import { generateTokenUri } from '../utils/generateTokenUri'
+import { generateTokenUriFromPosition } from '../utils/generateTokenUri'
 import { getCurrentPosition } from '../utils/getCurrentPosition'
-
+import { IPFS_BASE_URL, ipfs } from '../utils/ipfs'
 /**
  * Constants & Helpers
  */
@@ -33,23 +34,6 @@ import { getCurrentPosition } from '../utils/getCurrentPosition'
 // )
 
 // const MUMBAI_LOCATION_NFT_ADDRESS = '0xf52b2AD55748b63193cE105768086a911f705104'
-
-const IPFS_BASE_URL = 'https://ipfs.io/ipfs'
-// FIXME: IPFS - Using someone's projectID
-const projectId = '2DDHiA47zFkJXtnxzl2jFkyuaoq'
-const projectSecret = '96a91eeafc0a390ab66e6a87f61152aa'
-const projectIdAndSecret = `${projectId}:${projectSecret}`
-
-const ipfs = create({
-  host: 'ipfs.infura.io',
-  port: 5001,
-  protocol: 'https',
-  headers: {
-    authorization: `Basic ${Buffer.from(projectIdAndSecret).toString(
-      'base64'
-    )}`,
-  },
-})
 
 const Home: NextPage = () => {
   // const [state, dispatch] = useReducer(reducer, initialState)
@@ -117,11 +101,11 @@ const Home: NextPage = () => {
   const mintLocation = useCallback(async () => {
     try {
       // FIXME: type any
-      const position: any = await getCurrentPosition()
+      const position: GeolocationPosition = await getCurrentPosition()
       console.log(position)
 
       // Convert that position into `tokenURI` metadata
-      const tokenURI = generateTokenUri(position)
+      const tokenURI = generateTokenUriFromPosition(position)
 
       // Upload the `tokenURI` to IPFS
       const uploaded = await ipfs.add(tokenURI)

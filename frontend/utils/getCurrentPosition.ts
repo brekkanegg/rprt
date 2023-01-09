@@ -1,11 +1,13 @@
 function getPositionWrapper() {
-    // Simple wrapper
-    return new Promise((res, rej) => {
-        window.navigator.geolocation.getCurrentPosition(res, rej);
-    });
+  // Simple wrapper
+  return new Promise((res, rej) => {
+    navigator.geolocation.getCurrentPosition(res, rej)
+  })
 }
 
 export const getCurrentPosition = async () => {
-    const coords = await getPositionWrapper()
-    return coords
+  const position = await getPositionWrapper()
+  if (position instanceof GeolocationPosition) {
+    return position
+  } else throw Error('Position should be geolocation')
 }
