@@ -36,7 +36,6 @@ import { IPFS_BASE_URL, ipfs } from '../utils/ipfs'
 // const MUMBAI_LOCATION_NFT_ADDRESS = '0xf52b2AD55748b63193cE105768086a911f705104'
 
 const Home: NextPage = () => {
-  // const [state, dispatch] = useReducer(reducer, initialState)
   const [hasNftUri, setHasNftUri] = useState(false)
   const nftUriRef = useRef('')
 
@@ -96,11 +95,18 @@ const Home: NextPage = () => {
         isClosable: true,
       })
     },
+    onError(error) {
+      console.log('Error', error)
+      toast({
+        title: `${error}`,
+        status: 'error',
+        isClosable: true,
+      })
+    },
   })
 
   const mintLocation = useCallback(async () => {
     try {
-      // FIXME: type any
       const position: GeolocationPosition = await getCurrentPosition()
       console.log(position)
 
@@ -111,11 +117,18 @@ const Home: NextPage = () => {
       const uploaded = await ipfs.add(tokenURI)
 
       nftUriRef.current = `${IPFS_BASE_URL}/${uploaded.path}`
-      // // This will trigger the useEffect to run the `write()` function.
+
+      // FIXME: 코드 왜 이렇게 짜는 거지 - 가독성 떨어지네
+      // This will trigger the useEffect to run the `write()` function.
       setHasNftUri(true)
       console.log('nfturi: ', nftUriRef.current)
     } catch (error) {
       console.log('error', error)
+      toast({
+        title: `${error}`,
+        status: 'error',
+        isClosable: true,
+      })
     }
   }, [])
 
@@ -136,7 +149,7 @@ const Home: NextPage = () => {
         Mint Location NFT
       </Heading>
       <Text mt="8" fontSize="md" color="blue">
-        This page only works on the Polygon Mumbai Testnet or on a Local Chain.
+        This page only works on the Polygon Mumbai Testnet.
       </Text>
       <Box p="8" mt="8" bg="gray.100">
         <Text fontSize="xl" textAlign="center">

@@ -1,2 +1,2 @@
-export const LocationNFT = '0xa6DC392a5Ae33ee2C10Da7Aff54F3d8aDC445cF9'
-export const BuffNFT = '0x31c4A47Ae394E96DbA7847F81C8e80aab1a76d80'
+export const LocationNFT = '0xfe9Eb1FD78d2981bbD3ff2A57d193614704231b4'
+export const BuffNFT = '0x475B5b52a1fbe78bd287a3d2832D9cAa0c3dBA8a'

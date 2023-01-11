@@ -6,6 +6,7 @@ import {
   Image,
   SimpleGrid,
   Text,
+  useToast,
 } from '@chakra-ui/react'
 import { Result } from '@ethersproject/abi'
 import { IPFSHTTPClient } from 'ipfs-http-client'
@@ -30,6 +31,8 @@ export const NftList = ({
 }: NftListProps): JSX.Element => {
   const [nfts, setNfts] = useState<Array<NftMetadataType>>([])
 
+  const toast = useToast()
+
   useEffect(() => {
     const fetchNftData = async (ipfsHash: string) => {
       try {
@@ -45,6 +48,11 @@ export const NftList = ({
         return JSON.parse(raw)
       } catch (error) {
         console.log('error', error)
+        toast({
+          title: `${error}`,
+          status: 'error',
+          isClosable: true,
+        })
       }
     }
 

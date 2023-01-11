@@ -39,6 +39,7 @@ import { getCurrentPosition } from '../utils/getCurrentPosition'
 import { calcDistanceFromLatLonInMeters } from '../utils/calcDistanceFromLatLon'
 import { IPFS_BASE_URL, ipfs } from '../utils/ipfs'
 import { NftList } from '../components/NftList'
+import { EditableContract } from '../components/EditableContract'
 
 // FIXME: Find way to use wagmi instead
 const { Alchemy, Network } = require('alchemy-sdk')
@@ -59,11 +60,14 @@ const BuffMinter: NextPage = () => {
 
   const { isLocalChain } = useCheckLocalChain()
 
-  const { isMounted } = useIsMounted()
+  // const nftContract = isLocalChain
+  //   ? MUMBAI_BUFF_NFT_ADDRESS //LOCAL_CONTRACT_ADDRESS
+  //   : MUMBAI_BUFF_NFT_ADDRESS
 
-  const CONTRACT_ADDRESS = isLocalChain
-    ? MUMBAI_BUFF_NFT_ADDRESS //LOCAL_CONTRACT_ADDRESS
-    : MUMBAI_BUFF_NFT_ADDRESS
+  const [nftContract, setNftContract] = useState(MUMBAI_BUFF_NFT_ADDRESS)
+  const updatedNftContractRef = useRef(false)
+
+  const { isMounted } = useIsMounted()
 
   const { address } = useAccount()
 
@@ -71,17 +75,17 @@ const BuffMinter: NextPage = () => {
 
   const CONTRACT_CONFIG = useMemo(() => {
     return {
-      address: CONTRACT_ADDRESS,
+      address: nftContract,
       abi: NFTJson.abi,
     }
-  }, [CONTRACT_ADDRESS])
+  }, [nftContract])
 
   ///// NFT list
 
   // Gets the total number of NFTs owned by the connected address.
   const { data: nftBalanceData, refetch: refetchNftBalanceData } =
     useContractRead({
-      address: CONTRACT_ADDRESS,
+      address: nftContract,
       abi: erc721ABI,
       functionName: 'balanceOf',
       args: address ? [address] : undefined,
@@ -176,6 +180,14 @@ const BuffMinter: NextPage = () => {
       })
       refetchNftBalanceData()
     },
+    onError(error) {
+      console.log('Error', error)
+      toast({
+        title: `${error}`,
+        status: 'error',
+        isClosable: true,
+      })
+    },
   })
 
   const dropBuff = useCallback(async () => {
@@ -203,15 +215,14 @@ const BuffMinter: NextPage = () => {
 
       const whitelist: string[] = []
       for (let nft of locationNfts) {
-        // FIXME: what is this..?
         if (
           nft.metadataError &&
           nft.metadataError === 'IPFS gateway timed out'
         ) {
           console.log('Refetching metadata...', nft)
-          const metadata = await axios(nft.tokenUri.raw)
-            .then((response) => response.data)
-            .catch((error) => console.log(error))
+          const metadata = await axios(nft.tokenUri.raw).then(
+            (response) => response.data
+          )
           nft.rawMetadata = metadata
         }
 
@@ -288,14 +299,40 @@ const BuffMinter: NextPage = () => {
         console.log('nfturi: ', nftUriRef.current)
       } else {
         console.log('No target to give buff! \nAdjust time or distance Radius.')
+        toast({
+          title: 'No target to give buff.',
+          status: 'warning',
+          isClosable: true,
+        })
       }
     } catch (error) {
       console.log('error', error)
+      toast({
+        title: `${error}`,
+        status: 'error',
+        isClosable: true,
+      })
     }
   }, [timeRadius, distRadius])
 
   useEffect(() => {
+    if (updatedNftContractRef.current) return
+    updatedNftContractRef.current = true
+    const sessionNftContract = window.localStorage.getItem('nftContract')
+    if (sessionNftContract !== null) {
+      setNftContract(sessionNftContract)
+      console.log('State Set: ', sessionNftContract)
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log('localStorage Set: ', nftContract)
+    window.localStorage.setItem('nftContract', nftContract)
+  }, [nftContract])
+
+  useEffect(() => {
     if (hasWhitelist && write) {
+      console.log('22')
       write()
       setHasWhitelist(false)
     }
@@ -311,12 +348,17 @@ const BuffMinter: NextPage = () => {
         Drop Buff NFT
       </Heading>
       <Text mt="8" fontSize="md" color="blue">
-        This page only works on the Polygon Mumbai Testnet or on a Local Chain.
+        This page only works on the Polygon Mumbai Testnet.
       </Text>
+
       <Box p="8" mt="8" bg="gray.100">
         <Text fontSize="xl" textAlign="center">
-          Contract Address: {CONTRACT_ADDRESS}
+          Contract Address: {nftContract}
         </Text>
+        <EditableContract
+          nftContract={nftContract}
+          setContractFn={setNftContract}
+        />
         <Divider my="8" borderColor="gray.400" />
         <VStack shouldWrapChildren>
           <Text textAlign="center" mb="12px">
