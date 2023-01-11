@@ -1,8 +1,5 @@
 import {
-  Box,
   Button,
-  Divider,
-  Heading,
   Link,
   Text,
   NumberInput,
@@ -13,33 +10,25 @@ import {
   VStack,
   useToast,
 } from '@chakra-ui/react'
-import type { NextPage } from 'next'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   erc721ABI,
   useAccount,
   useContractRead,
-  useContractReads,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi'
 import axios from 'axios'
 import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
-import { BuffNFT as MUMBAI_BUFF_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
 import NFTJson from '../artifacts/contracts/BuffNFT.sol/BuffNFT.json'
-import { Layout } from '../components/layout/Layout'
-import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
-import {
-  generateTokenUriFromPosition,
-  generateTokenUriFromPhoto,
-} from '../utils/generateTokenUri'
+import { generateTokenUriFromPhoto } from '../utils/generateTokenUri'
 import { getCurrentPosition } from '../utils/getCurrentPosition'
 import { calcDistanceFromLatLonInMeters } from '../utils/calcDistanceFromLatLon'
 import { IPFS_BASE_URL, ipfs } from '../utils/ipfs'
-import { NftList } from '../components/NftList'
-import { EditableContract } from '../components/EditableContract'
+
+import { NftControlProps } from '../types/custom'
 
 // FIXME: Find way to use wagmi instead
 const { Alchemy, Network } = require('alchemy-sdk')
@@ -49,7 +38,7 @@ const settings = {
 }
 const alchemy = new Alchemy(settings)
 
-const BuffMinter: NextPage = () => {
+export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
   const [hasWhitelist, setHasWhitelist] = useState(false)
   const whitelistRef = useRef(new Array<string>())
   // const [hasNftUri, setHasNftUri] = useState(false)
@@ -58,90 +47,24 @@ const BuffMinter: NextPage = () => {
   const [distRadius, setDistRadius] = useState(100)
   const [timeRadius, setTimeRadius] = useState(300)
 
-  const { isLocalChain } = useCheckLocalChain()
-
-  // const nftContract = isLocalChain
-  //   ? MUMBAI_BUFF_NFT_ADDRESS //LOCAL_CONTRACT_ADDRESS
-  //   : MUMBAI_BUFF_NFT_ADDRESS
-
-  const [nftContract, setNftContract] = useState(MUMBAI_BUFF_NFT_ADDRESS)
-  const updatedNftContractRef = useRef(false)
-
   const { isMounted } = useIsMounted()
-
-  const { address } = useAccount()
 
   const toast = useToast()
 
   const CONTRACT_CONFIG = useMemo(() => {
     return {
-      address: nftContract,
+      address: contractAddress,
       abi: NFTJson.abi,
     }
-  }, [nftContract])
+  }, [contractAddress])
 
-  ///// NFT list
-
-  // Gets the total number of NFTs owned by the connected address.
   const { data: nftBalanceData, refetch: refetchNftBalanceData } =
     useContractRead({
-      address: nftContract,
+      address: contractAddress,
       abi: erc721ABI,
       functionName: 'balanceOf',
       args: address ? [address] : undefined,
     })
-
-  // Creates the contracts array for `nftTokenIds`
-  const tokenOwnerContractsArray = useMemo(() => {
-    let contractCalls = []
-
-    if (nftBalanceData && nftBalanceData.toNumber) {
-      const nftBalance = nftBalanceData.toNumber()
-
-      for (let tokenIndex = 0; tokenIndex < nftBalance; tokenIndex++) {
-        const contractObj = {
-          ...CONTRACT_CONFIG,
-          functionName: 'tokenOfOwnerByIndex',
-          args: [address, tokenIndex],
-        }
-
-        contractCalls.push(contractObj)
-      }
-    }
-
-    return contractCalls
-  }, [CONTRACT_CONFIG, address, nftBalanceData])
-
-  // Gets all of the NFT tokenIds owned by the connected address.
-  const { data: nftTokenIds } = useContractReads({
-    contracts: tokenOwnerContractsArray,
-    enabled: tokenOwnerContractsArray.length > 0,
-  })
-
-  // Creates the contracts array for `nftTokenUris`
-  const tokenUriContractsArray = useMemo(() => {
-    if (!nftTokenIds || nftTokenIds.length === 0) {
-      return []
-    }
-
-    const contractCalls = nftTokenIds?.map((tokenId) => {
-      return {
-        ...CONTRACT_CONFIG,
-        functionName: 'tokenURI',
-        args: tokenId ? [tokenId] : undefined,
-      }
-    })
-
-    return contractCalls
-  }, [CONTRACT_CONFIG, nftTokenIds])
-
-  // Gets all of the NFT tokenUris owned by the connected address.
-  const { data: nftTokenUris } = useContractReads({
-    contracts: tokenUriContractsArray,
-    enabled: tokenUriContractsArray.length > 0,
-  })
-
-  /////
 
   const { config } = usePrepareContractWrite({
     ...CONTRACT_CONFIG,
@@ -163,7 +86,7 @@ const BuffMinter: NextPage = () => {
         title: 'Transaction Successful',
         description: (
           <>
-            <Text>Successfully dropped your BUFF NFT!</Text>
+            <Text>Successfully dropped your Buff NFT!</Text>
             <Text>
               <Link
                 href={`https://mumbai.polygonscan.com/tx/${data?.transactionHash}`}
@@ -316,23 +239,7 @@ const BuffMinter: NextPage = () => {
   }, [timeRadius, distRadius])
 
   useEffect(() => {
-    if (updatedNftContractRef.current) return
-    updatedNftContractRef.current = true
-    const sessionNftContract = window.localStorage.getItem('nftContract')
-    if (sessionNftContract !== null) {
-      setNftContract(sessionNftContract)
-      console.log('State Set: ', sessionNftContract)
-    }
-  }, [])
-
-  useEffect(() => {
-    console.log('localStorage Set: ', nftContract)
-    window.localStorage.setItem('nftContract', nftContract)
-  }, [nftContract])
-
-  useEffect(() => {
     if (hasWhitelist && write) {
-      console.log('22')
       write()
       setHasWhitelist(false)
     }
@@ -343,83 +250,58 @@ const BuffMinter: NextPage = () => {
   }
 
   return (
-    <Layout>
-      <Heading as="h1" mb="8">
-        Drop Buff NFT
-      </Heading>
-      <Text mt="8" fontSize="md" color="blue">
-        This page only works on the Polygon Mumbai Testnet.
+    <VStack shouldWrapChildren>
+      <Text textAlign="center" mb="12px">
+        ⌚ Time Radius (sec){' '}
       </Text>
-
-      <Box p="8" mt="8" bg="gray.100">
-        <Text fontSize="xl" textAlign="center">
-          Contract Address: {nftContract}
-        </Text>
-        <EditableContract
-          nftContract={nftContract}
-          setContractFn={setNftContract}
-        />
-        <Divider my="8" borderColor="gray.400" />
-        <VStack shouldWrapChildren>
-          <Text textAlign="center" mb="12px">
-            ⌚ Time Radius (sec){' '}
-          </Text>
-          <NumberInput
-            // value={timeRadius}
-            isDisabled={!address || isLoading}
-            onChange={(value) => setTimeRadius(Number(value))}
-            size="md"
-            maxW={40}
-            defaultValue={300}
-            // min={100}
-            step={300}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Text textAlign="center" mb="12px">
-            🌍 Distance Radius (meter){' '}
-          </Text>
-          <NumberInput
-            // value={timeRadius}
-            isDisabled={!address || isLoading}
-            onChange={(value) => setDistRadius(Number(value))}
-            size="md"
-            maxW={40}
-            defaultValue={1000}
-            // min={100}
-            step={1000}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Text textAlign="center">
-            <Button
-              colorScheme="teal"
-              size="lg"
-              disabled={!address || isLoading}
-              onClick={dropBuff}
-              isLoading={isLoading}
-            >
-              {address
-                ? 'Drop Buff (only-owner)'
-                : 'Please Connect Your Wallet'}
-            </Button>
-          </Text>
-        </VStack>
-        <Divider my="8" borderColor="gray.400" />
-        {nftTokenUris && (
-          <NftList address={address} ipfs={ipfs} nftTokenUris={nftTokenUris} />
-        )}
-      </Box>
-    </Layout>
+      <NumberInput
+        // value={timeRadius}
+        isDisabled={!address || isLoading}
+        onChange={(value) => setTimeRadius(Number(value))}
+        size="md"
+        maxW={40}
+        defaultValue={300}
+        // min={100}
+        step={300}
+        min={0}
+      >
+        <NumberInputField />
+        <NumberInputStepper>
+          <NumberIncrementStepper />
+          <NumberDecrementStepper />
+        </NumberInputStepper>
+      </NumberInput>
+      <Text textAlign="center" mb="12px">
+        🌍 Distance Radius (meter){' '}
+      </Text>
+      <NumberInput
+        // value={timeRadius}
+        isDisabled={!address || isLoading}
+        onChange={(value) => setDistRadius(Number(value))}
+        size="md"
+        maxW={40}
+        defaultValue={1000}
+        // min={100}
+        step={1000}
+        min={0}
+      >
+        <NumberInputField />
+        <NumberInputStepper>
+          <NumberIncrementStepper />
+          <NumberDecrementStepper />
+        </NumberInputStepper>
+      </NumberInput>
+      <Text textAlign="center">
+        <Button
+          colorScheme="teal"
+          size="lg"
+          disabled={!address || isLoading}
+          onClick={dropBuff}
+          isLoading={isLoading}
+        >
+          {address ? 'Drop Buff (public for now)' : 'Please Connect Your Wallet'}
+        </Button>
+      </Text>
+    </VStack>
   )
 }
-
-export default BuffMinter

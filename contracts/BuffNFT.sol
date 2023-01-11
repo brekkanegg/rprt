@@ -38,7 +38,8 @@ contract BuffNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
     //     _safeMint(wAddress, tokenId);
     // }
 
-    function airdropNFTs(address[] calldata wAddresses, string[] calldata tokenUris) public onlyOwner {
+    // FIXME: public onlyOwner 
+    function airdropNFTs(address[] calldata wAddresses, string[] calldata tokenUris) public  {
         require(wAddresses.length == tokenUris.length);
         for (uint i = 0; i < wAddresses.length; i++) {
             _mintSingleNFT(wAddresses[i], tokenUris[i]);

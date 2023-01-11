@@ -60,7 +60,7 @@ const TokenGated: NextPage = () => {
     <>
       <Text mb="4" fontSize="lg">
         This page will check your authenticated user&apos;s address for a
-        particular BUFF.
+        particular Buff.
       </Text>
       <Text mb="6" fontSize="lg">
         This is checking for the{' '}
@@ -141,7 +141,7 @@ const TokenGated: NextPage = () => {
       <Alert status="success">
         <AlertIcon />
         <AlertTitle>Access Granted:</AlertTitle>
-        <AlertDescription>You got BUFF!</AlertDescription>
+        <AlertDescription>You got buff!</AlertDescription>
       </Alert>
     </Layout>
   )

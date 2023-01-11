@@ -1,143 +1,59 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Heading,
-  Link,
-  Text,
-  useToast,
-} from '@chakra-ui/react'
-import { create } from 'ipfs-http-client'
+import { Box, Divider, Flex, Heading, Text } from '@chakra-ui/react'
 import type { NextPage } from 'next'
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
-import {
-  useAccount,
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from 'wagmi'
-import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
-// import NFTJson from '../artifacts/contracts/LocationNFT.sol/LocationNFT.json'
-import NFTJson from '../artifacts/contracts/LocationNFT.sol/LocationNFT.json'
+import { useState, useRef, useEffect } from 'react'
+import { useAccount } from 'wagmi'
+import { LocationNFT as MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
+import { BuffNFT as MUMBAI_BUFF_NFT_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
 import { Layout } from '../components/layout/Layout'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
-import { generateTokenUriFromPosition } from '../utils/generateTokenUri'
-import { getCurrentPosition } from '../utils/getCurrentPosition'
-import { IPFS_BASE_URL, ipfs } from '../utils/ipfs'
-/**
- * Constants & Helpers
- */
-
-// const localProvider = new providers.StaticJsonRpcProvider(
-//   'http://localhost:8545'
-// )
-
-// const MUMBAI_LOCATION_NFT_ADDRESS = '0xf52b2AD55748b63193cE105768086a911f705104'
+import { NftMinter } from '../components/NftMinter'
+import { NftList } from '../components/NftList'
+import { EditableContract } from '../components/EditableContract'
+import { NftDropper } from '../components/NftDropper'
+import { AddressString, NftControlProps } from '../types/custom'
 
 const Home: NextPage = () => {
-  const [hasNftUri, setHasNftUri] = useState(false)
-  const nftUriRef = useRef('')
-
   const { isLocalChain } = useCheckLocalChain() //FIXME: Multiple chain support
+  const { address } = useAccount()
+
+  const updatedBuffContractRef = useRef(false)
+
+  // FIXME:
+  const LOCATION_NFT_CONTRACT_ADDRESS: AddressString = isLocalChain
+    ? MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS //LOCAL_LOCATION_NFT_ADDRESS
+    : MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS
+
+  const [locContract, setLocContract] = useState<AddressString>(
+    LOCATION_NFT_CONTRACT_ADDRESS
+  )
+
+  const BUFF_NFT_ADDRESS: AddressString = isLocalChain
+    ? MUMBAI_BUFF_NFT_CONTRACT_ADDRESS //LOCAL_BUFF_NFT_ADDRESS
+    : MUMBAI_BUFF_NFT_CONTRACT_ADDRESS
+  const [buffContract, setBuffContract] =
+    useState<AddressString>(BUFF_NFT_ADDRESS)
 
   const { isMounted } = useIsMounted()
 
-  // FIXME:
-  const CONTRACT_ADDRESS = isLocalChain
-    ? MUMBAI_LOCATION_NFT_ADDRESS //LOCAL_CONTRACT_ADDRESS
-    : MUMBAI_LOCATION_NFT_ADDRESS
+  useEffect(() => {
+    if (updatedBuffContractRef.current) return
 
-  const { address } = useAccount()
+    updatedBuffContractRef.current = true
+    const sessionNftContract = window.localStorage.getItem('BuffContract')
 
-  const toast = useToast()
-
-  // FIXME: Why use useMemo..?
-  const CONTRACT_CONFIG = useMemo(() => {
-    return {
-      address: CONTRACT_ADDRESS,
-      abi: NFTJson.abi,
-    }
-  }, [CONTRACT_ADDRESS])
-
-  const { config } = usePrepareContractWrite({
-    ...CONTRACT_CONFIG,
-    functionName: 'safeMint',
-    args: [address, nftUriRef.current],
-    enabled: hasNftUri,
-  })
-
-  const { data, write } = useContractWrite(config)
-
-  const { isLoading } = useWaitForTransaction({
-    hash: data?.hash,
-    onSuccess(data) {
-      console.log('success data', data)
-      setHasNftUri(false)
-      nftUriRef.current = ''
-      toast({
-        title: 'Transaction Successful',
-        description: (
-          <>
-            <Text>Successfully minted your Location NFT!</Text>
-            <Text>
-              <Link
-                href={`https://mumbai.polygonscan.com/tx/${data?.transactionHash}`}
-                isExternal
-              >
-                View on Polygonscan
-              </Link>
-            </Text>
-          </>
-        ),
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
-    },
-    onError(error) {
-      console.log('Error', error)
-      toast({
-        title: `${error}`,
-        status: 'error',
-        isClosable: true,
-      })
-    },
-  })
-
-  const mintLocation = useCallback(async () => {
-    try {
-      const position: GeolocationPosition = await getCurrentPosition()
-      console.log(position)
-
-      // Convert that position into `tokenURI` metadata
-      const tokenURI = generateTokenUriFromPosition(position)
-
-      // Upload the `tokenURI` to IPFS
-      const uploaded = await ipfs.add(tokenURI)
-
-      nftUriRef.current = `${IPFS_BASE_URL}/${uploaded.path}`
-
-      // FIXME: 코드 왜 이렇게 짜는 거지 - 가독성 떨어지네
-      // This will trigger the useEffect to run the `write()` function.
-      setHasNftUri(true)
-      console.log('nfturi: ', nftUriRef.current)
-    } catch (error) {
-      console.log('error', error)
-      toast({
-        title: `${error}`,
-        status: 'error',
-        isClosable: true,
-      })
+    if (sessionNftContract?.startsWith('0x')) {
+      // 이렇게까지 해야하나
+      const temp: AddressString = `0x${sessionNftContract.substring(2)}`
+      setBuffContract(temp)
+      console.log('State Set: ', sessionNftContract)
     }
   }, [])
 
   useEffect(() => {
-    if (hasNftUri && write) {
-      write()
-      setHasNftUri(false)
-    }
-  }, [hasNftUri, write])
+    console.log('localStorage Set: ', buffContract)
+    window.localStorage.setItem('BuffContract', buffContract)
+  }, [buffContract])
 
   if (!isMounted) {
     return null
@@ -146,31 +62,37 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <Heading as="h1" mb="8">
-        Mint Location NFT
+        Right Place at the Right Time
       </Heading>
       <Text mt="8" fontSize="md" color="blue">
         This page only works on the Polygon Mumbai Testnet.
       </Text>
-      <Box p="8" mt="8" bg="gray.100">
+      <Box p="8" mt="4" bg="gray.100">
         <Text fontSize="xl" textAlign="center">
-          Contract Address: {CONTRACT_ADDRESS}
+          Location NFT Contract:
         </Text>
-        <Divider my="8" borderColor="gray.400" />
-        <Text textAlign="center">
-          <Button
-            colorScheme="teal"
-            size="lg"
-            disabled={!address || isLoading}
-            onClick={mintLocation}
-            isLoading={isLoading}
-          >
-            {address ? 'Mint Location' : 'Please Connect Your Wallet'}
-          </Button>
+        <Text fontSize="xl" textAlign="center">
+          {LOCATION_NFT_CONTRACT_ADDRESS}
         </Text>
-        <Divider my="8" borderColor="gray.400" />
-        {/* {nftTokenUris && (
-          <NftList address={address} ipfs={ipfs} nftTokenUris={nftTokenUris} />
-        )} */}
+        <Divider my="4" borderColor="gray.400" />
+        {<NftMinter address={address} contractAddress={locContract} />}
+      </Box>
+      <Box p="8" mt="4" bg="gray.100">
+        <Text fontSize="xl" textAlign="center">
+          Buff NFT Contract:
+        </Text>
+        <EditableContract
+          nftContract={buffContract}
+          setContractCallback={setBuffContract}
+        />
+        <Divider my="4" borderColor="gray.400" />
+        {<NftDropper address={address} contractAddress={buffContract} />}
+      </Box>
+      <Box p="4" mt="4" bg="gray.100">
+        <Text fontSize="xl" textAlign="center">
+          Buff List:
+        </Text>
+        <NftList address={address} contractAddress={buffContract} />
       </Box>
     </Layout>
   )

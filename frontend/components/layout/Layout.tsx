@@ -24,17 +24,17 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
             <Flex py={[4, null, null, 0]}>
               <NextLink href="/" passHref legacyBehavior>
                 <Link px="4" py="1">
-                  Enter BUFF
+                  Home
                 </Link>
               </NextLink>
-              <NextLink href="/buff" passHref legacyBehavior>
+              {/* <NextLink href="/buff" passHref legacyBehavior>
                 <Link px="4" py="1">
                   Spread BUFF
                 </Link>
-              </NextLink>
+              </NextLink> */}
               <NextLink href="/buff-gated" passHref legacyBehavior>
                 <Link px="4" py="1">
-                  BUFF Gated
+                  Buff-gated
                 </Link>
               </NextLink>
             </Flex>

@@ -9,20 +9,34 @@ import {
   EditablePreview,
   useToast,
   Input,
+  HStack,
 } from '@chakra-ui/react'
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
 
 interface NftContractProps {
   nftContract: string
-  setContractFn: Function
+  setContractCallback: Function
 }
 
 export const EditableContract = ({
   nftContract,
-  setContractFn,
+  setContractCallback,
 }: NftContractProps): JSX.Element => {
-  const validateContract = () => {
-    ;(nextValue: string) => setContractFn(nextValue)
+  const toast = useToast()
+
+  const handleInputSubmit = async (nextValue: string) => {
+    if (nextValue.startsWith('0x')) {
+      setContractCallback(nextValue)
+    } else {
+      toast({
+        title: 'Contract address should starts with 0x, reloading the page...',
+        status: 'error',
+        isClosable: true,
+      })
+      // FIXME: 궁여지책
+      window.location.reload()
+      throw 'Contract address should starts with 0x'
+    }
   }
 
   /* Here's a custom control */
@@ -63,9 +77,9 @@ export const EditableContract = ({
     <Editable
       textAlign="center"
       defaultValue={nftContract}
-      fontSize="2xl"
+      fontSize="xl"
       isPreviewFocusable={false}
-      onSubmit={(nextValue: string) => setContractFn(nextValue)}
+      onSubmit={handleInputSubmit}
       submitOnBlur={false}
     >
       <EditablePreview />
