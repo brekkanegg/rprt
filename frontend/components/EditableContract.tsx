@@ -15,18 +15,18 @@ import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
 
 interface NftContractProps {
   nftContract: string
-  setContractCallback: Function
+  setContractAddress: Function
 }
 
 export const EditableContract = ({
   nftContract,
-  setContractCallback,
+  setContractAddress,
 }: NftContractProps): JSX.Element => {
   const toast = useToast()
 
   const handleInputSubmit = async (nextValue: string) => {
     if (nextValue.startsWith('0x')) {
-      setContractCallback(nextValue)
+      setContractAddress(nextValue)
     } else {
       toast({
         title: 'Contract address should starts with 0x, reloading the page...',
@@ -79,7 +79,7 @@ export const EditableContract = ({
       defaultValue={nftContract}
       fontSize="xl"
       isPreviewFocusable={false}
-      onSubmit={handleInputSubmit}
+      onSubmit={handleInputSubmit} //(nextValue: string) => setContractAddress(nextValue)
       submitOnBlur={false}
     >
       <EditablePreview />

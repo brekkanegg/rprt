@@ -27,11 +27,11 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
                   Home
                 </Link>
               </NextLink>
-              {/* <NextLink href="/buff" passHref legacyBehavior>
+              <NextLink href="/mynft" passHref legacyBehavior>
                 <Link px="4" py="1">
-                  Spread BUFF
+                  My NFT
                 </Link>
-              </NextLink> */}
+              </NextLink>
               <NextLink href="/buff-gated" passHref legacyBehavior>
                 <Link px="4" py="1">
                   Buff-gated

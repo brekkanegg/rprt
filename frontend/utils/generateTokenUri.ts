@@ -1,25 +1,11 @@
-type UrlsType = {
-  regular: string
-}
-
-type UserType = {
-  username: string
-}
-
-// This data comes from the Unsplash API
-// https://unsplash.com/developers
-type DataType = {
-  description: string
-  urls: UrlsType
-  user: UserType
-  views: number
-  width: number
-  height: number
-  downloads: number
-}
-
 export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
+  const formattedDate = new Date(data.timestamp * 1000)
+  console.log(formattedDate)
+
   const tokenUri = {
+    description: 'Sample location NFT built by brekkanegg',
+    image: '', //FIXME
+    name: `Location at ${formattedDate}`,
     attributes: [
       {
         trait_type: 'Latitude',
@@ -41,6 +27,26 @@ export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
   }
 
   return JSON.stringify(tokenUri)
+}
+
+type UrlsType = {
+  regular: string
+}
+
+type UserType = {
+  username: string
+}
+
+// This data comes from the Unsplash API
+// https://unsplash.com/developers
+type DataType = {
+  description: string
+  urls: UrlsType
+  user: UserType
+  views: number
+  width: number
+  height: number
+  downloads: number
 }
 
 export const generateTokenUriFromPhoto = (data: DataType) => {
