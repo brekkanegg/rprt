@@ -13,7 +13,7 @@ interface NftCardProps {
 
 const NftCard = ({
   //   cardKey,
-  //   key,
+  key,
   image,
   id,
   title,
@@ -23,7 +23,7 @@ const NftCard = ({
 }: NftCardProps) => {
   return (
     <Card
-      //   key={cardKey} //{`${address}_${id}`}
+      key={key} //{`${address}_${id}`}
       className="w-1/5 mr-3 mb-4 bg-gray-100 rounded-md"
     >
       {/* <img className="w-full rounded-t-md" key={id} src={image}></img> */}
