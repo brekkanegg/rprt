@@ -1,4 +1,7 @@
+import { Image } from '@chakra-ui/react'
+
 interface NftCardProps {
+  key: string
   image: string
   id: string
   title: string
@@ -8,6 +11,7 @@ interface NftCardProps {
 }
 
 const NftCard = ({
+  key,
   image,
   id,
   title,
@@ -17,7 +21,8 @@ const NftCard = ({
 }: NftCardProps) => {
   return (
     <div className="w-1/5 mr-3 mb-4 bg-slate-100 rounded-md">
-      <img className="w-full rounded-t-md" key={id} src={image}></img>
+      {/* <img className="w-full rounded-t-md" key={id} src={image}></img> */}
+      <Image key={key} src={image}></Image>
       <div className="p-3">
         <div className="flex mb-3">
           <div className="flex-grow">
@@ -28,7 +33,8 @@ const NftCard = ({
             <a
               target="_blank"
               className="text-blue-700"
-              href={`https://etherscan.io/token/${address}`}
+              href={`https://mumbai.polgonscan.com/token/${address}`}
+              rel="noopener noreferrer"
             >{`${address.slice(0, 4)}...${address.slice(
               address.length - 4
             )}`}</a>

@@ -3,9 +3,9 @@ export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
   console.log(formattedDate)
 
   const tokenUri = {
-    description: 'Sample location NFT built by brekkanegg',
+    description: 'Made by brekkanegg',
     image: '', //FIXME
-    name: `Location at ${formattedDate}`,
+    name: `Sample location NFT`,
     attributes: [
       {
         trait_type: 'Latitude',

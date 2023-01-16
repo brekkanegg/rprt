@@ -58,14 +58,6 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
     }
   }, [contractAddress])
 
-  const { data: nftBalanceData, refetch: refetchNftBalanceData } =
-    useContractRead({
-      address: contractAddress,
-      abi: erc721ABI,
-      functionName: 'balanceOf',
-      args: address ? [address] : undefined,
-    })
-
   const { config } = usePrepareContractWrite({
     ...CONTRACT_CONFIG,
     functionName: 'airdropNFTs',
@@ -101,7 +93,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
         duration: 5000,
         isClosable: true,
       })
-      refetchNftBalanceData()
+      // refetchNftBalanceData()
     },
     onError(error) {
       console.log('Error', error)
@@ -299,7 +291,9 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
           onClick={dropBuff}
           isLoading={isLoading}
         >
-          {address ? 'Drop Buff (public for now)' : 'Please Connect Your Wallet'}
+          {address
+            ? 'Drop Buff (public for now)'
+            : 'Please Connect Your Wallet'}
         </Button>
       </Text>
     </VStack>

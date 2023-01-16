@@ -21,13 +21,13 @@ const MyNFTs: NextPage = () => {
 
   useEffect(() => {
     fetchNFTs({
-      owner: address,
-      contractAddress: contractAddress,
-      setNFTs: setNFTs,
+      address,
+      contractAddress,
+      setNFTs,
       filterAddresses,
       retryAttempt: 1,
     })
-  }, [address])
+  }, [address, contractAddress, filterAddresses])
 
   return (
     <Layout>
@@ -57,9 +57,9 @@ const MyNFTs: NextPage = () => {
                 disabled={!address}
                 onClick={() => {
                   fetchNFTs({
-                    owner: address,
-                    contractAddress: contractAddress,
-                    setNFTs: setNFTs,
+                    address,
+                    contractAddress,
+                    setNFTs,
                     filterAddresses,
                     retryAttempt: 1,
                   })
@@ -78,6 +78,7 @@ const MyNFTs: NextPage = () => {
             NFTs.map((NFT: any) => {
               return (
                 <NftCard
+                  key={`${NFT.contract.address}_${NFT.id.tokenId}`}
                   image={NFT.media[0].gateway}
                   id={NFT.id.tokenId}
                   title={NFT.title}

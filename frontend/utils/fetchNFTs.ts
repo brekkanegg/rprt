@@ -2,7 +2,7 @@
 const endpoint = process.env.NEXT_PUBLIC_MUMBAI_TESTNET_RPC
 
 export interface NftFetchProps {
-  owner?: `0x${string}` | null
+  address?: `0x${string}` | null
   contractAddress: string
   setNFTs: Function
   filterAddresses: Array<string>
@@ -10,7 +10,7 @@ export interface NftFetchProps {
 }
 
 export const fetchNFTs = async ({
-  owner,
+  address,
   contractAddress,
   setNFTs,
   filterAddresses,
@@ -19,21 +19,21 @@ export const fetchNFTs = async ({
   if (retryAttempt === 5) {
     return
   }
-  if (owner) {
+  if (address) {
     let data
     try {
       if (contractAddress) {
         data = await fetch(
-          `${endpoint}/getNFTs?owner=${owner}&contractAddresses%5B%5D=${contractAddress}`
+          `${endpoint}/getNFTs?owner=${address}&contractAddresses%5B%5D=${contractAddress}`
         ).then((data) => data.json())
       } else {
-        data = await fetch(`${endpoint}/getNFTs?owner=${owner}`).then((data) =>
-          data.json()
+        data = await fetch(`${endpoint}/getNFTs?owner=${address}`).then(
+          (data) => data.json()
         )
       }
     } catch (e) {
       fetchNFTs({
-        owner,
+        address,
         contractAddress,
         setNFTs,
         filterAddresses,
