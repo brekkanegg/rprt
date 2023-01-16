@@ -75,11 +75,10 @@ const MyNFTs: NextPage = () => {
         <Divider my="4" borderColor="gray.400" />
         <Box className="flex flex-wrap justify-center">
           {NFTs ? (
-            NFTs.map((NFT: any, index: number) => {
+            NFTs.map((NFT: any) => {
               return (
                 <NftCard
                   key={`${NFT.contract.address}_${NFT.id.tokenId}`}
-                  // cardKey={`${NFT.contract.address}_${NFT.id.tokenId}`} //{index}
                   image={NFT.media[0].gateway}
                   id={NFT.id.tokenId}
                   title={NFT.title}

@@ -1,8 +1,6 @@
 import { Image, Card } from '@chakra-ui/react'
 
 interface NftCardProps {
-  //   cardKey: string
-  key: string
   image: string
   id: string
   title: string
@@ -12,8 +10,6 @@ interface NftCardProps {
 }
 
 const NftCard = ({
-  //   cardKey,
-  key,
   image,
   id,
   title,
@@ -22,10 +18,7 @@ const NftCard = ({
   attributes,
 }: NftCardProps) => {
   return (
-    <Card
-      key={key} //{`${address}_${id}`}
-      className="w-1/5 mr-3 mb-4 bg-gray-100 rounded-md"
-    >
+    <Card className="w-1/5 mr-3 mb-4 bg-gray-100 rounded-md">
       {/* <img className="w-full rounded-t-md" key={id} src={image}></img> */}
       <Image className="w-full rounded-t-md" src={image} alt={''}></Image>
       <div className="p-3">
@@ -49,9 +42,12 @@ const NftCard = ({
       </div>
       <div className="flex flex-wrap justify-center items-center p-3 ">
         {attributes?.length > 0 &&
-          attributes.map((attribute) => {
+          attributes.map((attribute, index) => {
             return (
-              <div className="w-1/2 mb-2 flex justify-start flex-col">
+              <div
+                key={index}
+                className="w-1/2 mb-2 flex justify-start flex-col"
+              >
                 <p className="mr-2 font-bold">{attribute.trait_type}:</p>
                 <p className="text-sm">{attribute.value}</p>
               </div>
