@@ -1,26 +1,11 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Heading,
-  Link,
-  Text,
-  useToast,
-} from '@chakra-ui/react'
-import { create } from 'ipfs-http-client'
-import type { NextPage } from 'next'
+import { Button, Link, Text, useToast } from '@chakra-ui/react'
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import {
-  useAccount,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from 'wagmi'
-import { LocationNFT as MUMBAI_LOCATION_NFT_ADDRESS } from '../artifacts/contracts/contractAddress'
-// import NFTJson from '../artifacts/contracts/LocationNFT.sol/LocationNFT.json'
 import NFTJson from '../artifacts/contracts/LocationNFT.sol/LocationNFT.json'
-import { Layout } from '../components/layout/Layout'
-import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
 import { generateTokenUriFromPosition } from '../utils/generateTokenUri'
 import { getCurrentPosition } from '../utils/getCurrentPosition'

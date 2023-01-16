@@ -1,10 +1,40 @@
+type UrlsType = {
+  regular: string
+}
+
+type UserType = {
+  username: string
+}
+
+// This data comes from the Unsplash API
+// https://unsplash.com/developers
+type DataType = {
+  description: string
+  urls: UrlsType
+  user: UserType
+  views: number
+  width: number
+  height: number
+  downloads: number
+}
+
+const GMAP_API = 'https://maps.googleapis.com/maps/api/staticmap'
+const GMAP_APIKEY = 'AIzaSyCXjOn7hweLxfSwQ-IaVqLPNeAT4sCD76E'
+const GMAP_SIGNATURE = 'UPzNuHJpF82Ly0nADKuCwi2ErgU='
+
 export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
-  const formattedDate = new Date(data.timestamp * 1000)
-  console.log(formattedDate)
+  const lat = data.coords.latitude
+  const lon = data.coords.longitude
+
+  const zoom = `14`
+  const size = `400x400`
+  const markers = `color:blue%7Clabel:H%7C${lat},${lon}`
+  const staticMap = `${GMAP_API}?center=${lat},${lon}&zoom=${zoom}&size=${size}&maptype=roadmap&markers=${markers}&key=${GMAP_APIKEY}` //&signature=${GMAP_SIGNATURE}`
+  console.log(staticMap)
 
   const tokenUri = {
     description: 'Made by brekkanegg',
-    image: '', //FIXME
+    image: staticMap,
     name: `Sample location NFT`,
     attributes: [
       {
@@ -27,26 +57,6 @@ export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
   }
 
   return JSON.stringify(tokenUri)
-}
-
-type UrlsType = {
-  regular: string
-}
-
-type UserType = {
-  username: string
-}
-
-// This data comes from the Unsplash API
-// https://unsplash.com/developers
-type DataType = {
-  description: string
-  urls: UrlsType
-  user: UserType
-  views: number
-  width: number
-  height: number
-  downloads: number
 }
 
 export const generateTokenUriFromPhoto = (data: DataType) => {

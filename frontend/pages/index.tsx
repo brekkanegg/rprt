@@ -1,4 +1,13 @@
-import { Box, Divider, Flex, Heading, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Divider,
+  Link,
+  Heading,
+  Text,
+  Button,
+  Center,
+} from '@chakra-ui/react'
+import { FaFaucet } from 'react-icons/fa'
 import type { NextPage } from 'next'
 import { useState, useRef, useEffect } from 'react'
 import { useAccount } from 'wagmi'
@@ -45,7 +54,6 @@ const Home: NextPage = () => {
   }, [])
 
   useEffect(() => {
-    console.log('localStorage Set: ', buffContract)
     window.localStorage.setItem('BuffContract', buffContract)
   }, [buffContract])
 
@@ -61,6 +69,11 @@ const Home: NextPage = () => {
       <Text mt="8" fontSize="md" color="blue">
         This page only works on the Polygon Mumbai Testnet.
       </Text>
+      <Button mt="2" colorScheme="blue" leftIcon={<FaFaucet />}>
+        <Center>
+          <Link href="https://mumbaifaucet.com/">Go to Mumbai faucet</Link>
+        </Center>
+      </Button>
       <Box p="8" mt="4" bg="gray.100">
         <Text fontSize="xl" textAlign="center">
           Location NFT Contract:

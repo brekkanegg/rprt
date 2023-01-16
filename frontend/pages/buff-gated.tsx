@@ -71,9 +71,9 @@ const TokenGated: NextPage = () => {
         >
           Buff Token (BFT)
         </Link>{' '}
-        on the POLYGON MUMBAI Testnet. You can test this out by{' '}
+        on the POLYGON MUMBAI Testnet. You can test this at{' '}
         <NextLink href="/" passHref>
-          <Link color="teal.500">Enter Buff</Link>
+          <Link color="teal.500">Home</Link>
         </NextLink>
         .
       </Text>
@@ -141,7 +141,7 @@ const TokenGated: NextPage = () => {
       <Alert status="success">
         <AlertIcon />
         <AlertTitle>Access Granted:</AlertTitle>
-        <AlertDescription>You got buff!</AlertDescription>
+        <AlertDescription>You have buff!</AlertDescription>
       </Alert>
     </Layout>
   )

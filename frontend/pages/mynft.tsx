@@ -1,33 +1,55 @@
-import { Box, Divider, Flex, Heading, Text, Button } from '@chakra-ui/react'
+import { Box, Divider, Heading, Text, Button, useToast } from '@chakra-ui/react'
 
 import type { NextPage } from 'next'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 
 import { Layout } from '../components/layout/Layout'
 
 import NftCard from '../components/NftCard'
-import { fetchNFTs } from '../utils/fetchNFTs'
+// import { fetchNFTs } from '../utils/fetchNFTs'
 
 const MyNFTs: NextPage = () => {
   // const [owner, setOwner] = useState('')
   const { address } = useAccount()
-
   const [contractAddress, setContractAddress] = useState('')
   const [NFTs, setNFTs] = useState<any>([])
 
-  const filterAddresses = ['']
+  const toast = useToast()
+
+  // const filterAddresses = ['']
+
+  const fetchNFTs = useCallback(async () => {
+    if (address) {
+      let data
+      try {
+        if (contractAddress) {
+          data = await fetch(
+            `${process.env.NEXT_PUBLIC_MUMBAI_TESTNET_RPC}/getNFTs?owner=${address}&contractAddresses%5B%5D=${contractAddress}`
+          ).then((data) => data.json())
+        } else {
+          data = await fetch(
+            `${process.env.NEXT_PUBLIC_MUMBAI_TESTNET_RPC}/getNFTs?owner=${address}`
+          ).then((data) => data.json())
+        }
+      } catch (error) {
+        console.log(error)
+        toast({
+          title: `${error}`,
+          status: 'error',
+          isClosable: true,
+        })
+      }
+
+      setNFTs(data.ownedNfts)
+      return data
+    }
+  }, [address, contractAddress])
 
   useEffect(() => {
-    fetchNFTs({
-      address,
-      contractAddress,
-      setNFTs,
-      filterAddresses,
-      retryAttempt: 1,
-    })
-  }, [address, contractAddress, filterAddresses])
+    fetchNFTs()
+  }, [address, contractAddress])
 
   return (
     <Layout>
@@ -56,13 +78,7 @@ const MyNFTs: NextPage = () => {
                 size="lg"
                 disabled={!address}
                 onClick={() => {
-                  fetchNFTs({
-                    address,
-                    contractAddress,
-                    setNFTs,
-                    filterAddresses,
-                    retryAttempt: 1,
-                  })
+                  fetchNFTs()
                 }}
                 // isLoading={isLoading}
               >
