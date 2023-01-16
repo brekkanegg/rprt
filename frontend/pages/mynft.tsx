@@ -73,12 +73,13 @@ const MyNFTs: NextPage = () => {
         </Box>
 
         <Divider my="4" borderColor="gray.400" />
-        <section className="flex flex-wrap justify-center">
+        <Box className="flex flex-wrap justify-center">
           {NFTs ? (
-            NFTs.map((NFT: any) => {
+            NFTs.map((NFT: any, index: number) => {
               return (
                 <NftCard
                   key={`${NFT.contract.address}_${NFT.id.tokenId}`}
+                  // cardKey={`${NFT.contract.address}_${NFT.id.tokenId}`} //{index}
                   image={NFT.media[0].gateway}
                   id={NFT.id.tokenId}
                   title={NFT.title}
@@ -91,7 +92,7 @@ const MyNFTs: NextPage = () => {
           ) : (
             <div>No NFTs found</div>
           )}
-        </section>
+        </Box>
       </div>
     </Layout>
   )
