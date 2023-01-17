@@ -50,6 +50,7 @@ export const NftMinter = ({
     onSuccess(data) {
       console.log('success data', data)
       setHasNftUri(false)
+      setNewMint(nftUriRef.current)
       nftUriRef.current = ''
       toast({
         title: 'Transaction Successful',
@@ -98,7 +99,6 @@ export const NftMinter = ({
       // This will trigger the useEffect to run the `write()` function.
       setHasNftUri(true)
       console.log('nfturi: ', nftUriRef.current)
-      setNewMint(nftUriRef.current)
     } catch (error) {
       console.log('error', error)
       toast({
