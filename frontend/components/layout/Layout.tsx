@@ -23,18 +23,18 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
           >
             <Flex py={[4, null, null, 0]}>
               <NextLink href="/" passHref legacyBehavior>
-                <Link px="4" py="1">
-                  Home
+                <Link px="4" py="1" size="xl" as="u">
+                  Buff Recipient
                 </Link>
               </NextLink>
-              <NextLink href="/mynft" passHref legacyBehavior>
+              <NextLink href="/buff-giver" passHref legacyBehavior>
                 <Link px="4" py="1">
-                  My NFT
+                  Buff Giver
                 </Link>
               </NextLink>
               <NextLink href="/buff-gated" passHref legacyBehavior>
                 <Link px="4" py="1">
-                  Buff-gated
+                  Buff Gated
                 </Link>
               </NextLink>
             </Flex>

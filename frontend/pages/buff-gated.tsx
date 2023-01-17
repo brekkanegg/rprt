@@ -96,7 +96,7 @@ const TokenGated: NextPage = () => {
     return (
       <Layout>
         <Heading as="h1" mb="8">
-          Token Gated Page
+          Buff Gated Page
         </Heading>
         {sharedDescription}
         <Alert status="error">
@@ -114,7 +114,7 @@ const TokenGated: NextPage = () => {
     return (
       <Layout>
         <Heading as="h1" mb="8">
-          Token Gated Page
+          Buff Gated Page
         </Heading>
         {sharedDescription}
         <Text mb="4" fontSize="lg">
@@ -132,7 +132,7 @@ const TokenGated: NextPage = () => {
   return (
     <Layout>
       <Heading as="h1" mb="8">
-        Token Gated Page
+        Buff Token Gated Page
       </Heading>
       {sharedDescription}
       <Text mb="4" fontSize="lg">

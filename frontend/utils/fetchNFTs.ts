@@ -1,26 +1,12 @@
-import { useCallback } from 'react'
+import { NftControlProps } from '../types/custom'
 
 // Go to www.alchemy.com and create an account to grab your own api key!
 const endpoint = process.env.NEXT_PUBLIC_MUMBAI_TESTNET_RPC
 
-export interface NftFetchProps {
-  address?: `0x${string}` | null
-  contractAddress: string
-  setNFTs: Function
-  // filterAddresses: Array<string>
-  retryAttempt: number
-}
-
-export const fetchNFTs = async ({
+export const fetchNfts = async ({
   address,
   contractAddress,
-  setNFTs,
-  // filterAddresses,
-  retryAttempt,
-}: NftFetchProps) => {
-  if (retryAttempt === 5) {
-    return
-  }
+}: NftControlProps) => {
   if (address) {
     let data
     try {
@@ -34,16 +20,11 @@ export const fetchNFTs = async ({
         )
       }
     } catch (e) {
-      fetchNFTs({
-        address,
-        contractAddress,
-        setNFTs,
-        // filterAddresses,
-        retryAttempt: retryAttempt + 1,
-      })
+      console.log(e)
     }
 
-    setNFTs(data.ownedNfts)
-    return data
+    return data.ownedNfts
+    // setNFTs(data.ownedNfts)
+    // return data
   }
 }

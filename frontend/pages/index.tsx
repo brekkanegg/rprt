@@ -6,56 +6,54 @@ import {
   Text,
   Button,
   Center,
+  SimpleGrid,
+  RadioGroup,
+  Radio,
+  CheckboxGroup,
+  Checkbox,
+  Stack,
 } from '@chakra-ui/react'
 import { FaFaucet } from 'react-icons/fa'
 import type { NextPage } from 'next'
 import { useState, useRef, useEffect } from 'react'
 import { useAccount } from 'wagmi'
-
 import { LocationNFT as MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
-import { BuffNFT as MUMBAI_BUFF_NFT_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
 import { Layout } from '../components/layout/Layout'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
 import { NftMinter } from '../components/NftMinter'
-import { EditableContract } from '../components/EditableContract'
-import { NftDropper } from '../components/NftDropper'
-import { AddressString, NftControlProps } from '../types/custom'
+import { AddressString } from '../types/custom'
+import { NftCard } from '../components/NftCard'
+import { fetchNfts } from '../utils/fetchNfts'
 
 const Home: NextPage = () => {
   const { isLocalChain } = useCheckLocalChain() //FIXME: Multiple chain support
   const { address } = useAccount()
 
-  const updatedBuffContractRef = useRef(false)
+  const [NFTs, setNFTs] = useState<any>([])
+  const [filterContract, setFilterContract] = useState('') // FIXME: Only loc / only buff
 
-  // FIXME:
+  const [hideLocationNft, setHideLocationNft] = useState(false)
+  const [hideBuffNft, setHideBuffNft] = useState(false)
+
+  //FIXME: Multiple chain support
   const LOCATION_NFT_CONTRACT_ADDRESS: AddressString = isLocalChain
     ? MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS //LOCAL_LOCATION_NFT_ADDRESS
     : MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS
-  const [locContract, setLocContract] = useState<AddressString>(
-    LOCATION_NFT_CONTRACT_ADDRESS
-  )
-
-  const BUFF_NFT_CONTRACT_ADDRESS: string = isLocalChain
-    ? MUMBAI_BUFF_NFT_CONTRACT_ADDRESS //LOCAL_BUFF_NFT_ADDRESS
-    : MUMBAI_BUFF_NFT_CONTRACT_ADDRESS
-  const [buffContract, setBuffContract] = useState(BUFF_NFT_CONTRACT_ADDRESS)
+  // const [locContract, setLocContract] = useState<AddressString>(
+  //   LOCATION_NFT_CONTRACT_ADDRESS
+  // )
 
   const { isMounted } = useIsMounted()
 
   useEffect(() => {
-    if (updatedBuffContractRef.current) return
-
-    updatedBuffContractRef.current = true
-    const sessionNftContract = window.localStorage.getItem('BuffContract')
-    if (sessionNftContract !== null) {
-      setBuffContract(sessionNftContract)
-    }
-  }, [])
-
-  useEffect(() => {
-    window.localStorage.setItem('BuffContract', buffContract)
-  }, [buffContract])
+    fetchNfts({
+      address,
+      contractAddress: filterContract,
+    }).then((ownedNfts) => {
+      setNFTs(ownedNfts)
+    })
+  }, [address, filterContract, NftMinter])
 
   if (!isMounted) {
     return null
@@ -64,8 +62,11 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <Heading as="h1" mb="8">
-        Right Place at the Right Time
+        Buff Recipient
       </Heading>
+      <Text mb="4" fontSize="lg">
+        Mint your location to get buff. Check your NFTs below.
+      </Text>
       <Text mt="8" fontSize="md" color="blue">
         This page only works on the Polygon Mumbai Testnet.
       </Text>
@@ -82,18 +83,69 @@ const Home: NextPage = () => {
           {LOCATION_NFT_CONTRACT_ADDRESS}
         </Text>
         <Divider my="4" borderColor="gray.400" />
-        {<NftMinter address={address} contractAddress={locContract} />}
+        {
+          <NftMinter
+            address={address}
+            contractAddress={LOCATION_NFT_CONTRACT_ADDRESS}
+          />
+        }
       </Box>
+      <Divider my="4" borderColor="gray.400" />
       <Box p="8" mt="4" bg="gray.100">
-        <Text fontSize="xl" textAlign="center">
-          Buff NFT Contract:
-        </Text>
-        <EditableContract
-          nftContract={buffContract}
-          setContractAddress={setBuffContract}
-        />
+        <Center mb="4" fontSize="xl">
+          <Text>My NFTs:</Text>
+          <CheckboxGroup>
+            <Stack mx="8" spacing={5} direction="row">
+              <Checkbox
+                colorScheme="green"
+                onChange={(e) => {
+                  setHideLocationNft(e.target.checked)
+                }}
+              >
+                Hide Location
+              </Checkbox>
+              <Checkbox
+                colorScheme="green"
+                onChange={(e) => {
+                  setHideBuffNft(e.target.checked)
+                }}
+              >
+                Hide Buff
+              </Checkbox>
+            </Stack>
+          </CheckboxGroup>
+        </Center>
         <Divider my="4" borderColor="gray.400" />
-        {<NftDropper address={address} contractAddress={buffContract} />}
+        <SimpleGrid my="6" columns={[1, 1, 3]} gap="6">
+          {NFTs ? (
+            NFTs.filter((NFT: any) => {
+              if (
+                hideLocationNft &&
+                NFT.contractMetadata.name === 'LoCationToken'
+              ) {
+                return false
+              }
+              if (hideBuffNft && NFT.contractMetadata.name === 'BuFfToken') {
+                return false
+              }
+              return true
+            }).map((NFT: any) => {
+              return (
+                <NftCard
+                  key={`${NFT.contract.address}_${NFT.id.tokenId}`}
+                  image={NFT.media[0].gateway}
+                  id={NFT.id.tokenId}
+                  title={NFT.title}
+                  address={NFT.contract.address}
+                  description={NFT.description}
+                  attributes={NFT.metadata.attributes}
+                ></NftCard>
+              )
+            })
+          ) : (
+            <div>No NFTs found</div>
+          )}
+        </SimpleGrid>
       </Box>
     </Layout>
   )

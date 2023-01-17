@@ -240,7 +240,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
 
   return (
     <VStack shouldWrapChildren>
-      <Text textAlign="center" mb="12px">
+      <Text textAlign="center" my="4" >
         ⌚ Time Radius (sec){' '}
       </Text>
       <NumberInput
@@ -260,11 +260,12 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
           <NumberDecrementStepper />
         </NumberInputStepper>
       </NumberInput>
-      <Text textAlign="center" mb="12px">
+      <Text textAlign="center" my="4">
         🌍 Distance Radius (meter){' '}
       </Text>
       <NumberInput
         // value={timeRadius}
+
         isDisabled={!address || isLoading}
         onChange={(value) => setDistRadius(Number(value))}
         size="md"
@@ -280,7 +281,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
           <NumberDecrementStepper />
         </NumberInputStepper>
       </NumberInput>
-      <Text textAlign="center">
+      <Text textAlign="center" mt="8">
         <Button
           colorScheme="teal"
           size="lg"
@@ -289,7 +290,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
           isLoading={isLoading}
         >
           {address
-            ? 'Drop Buff (public for now)'
+            ? 'Give Buff (public for now)'
             : 'Please Connect Your Wallet'}
         </Button>
       </Text>

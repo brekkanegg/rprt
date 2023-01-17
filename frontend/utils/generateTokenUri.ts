@@ -35,7 +35,7 @@ export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
   const tokenUri = {
     description: 'Made by brekkanegg',
     image: staticMap,
-    name: `Sample location NFT`,
+    name: `Sample Location NFT`,
     attributes: [
       {
         trait_type: 'Latitude',
@@ -63,7 +63,7 @@ export const generateTokenUriFromPhoto = (data: DataType) => {
   const tokenUri = {
     description: data.description,
     image: data.urls.regular,
-    name: data.user.username,
+    name: `Sample Buff NFT`,
     attributes: [
       {
         trait_type: 'Views',

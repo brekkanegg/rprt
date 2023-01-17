@@ -9,7 +9,7 @@ import {
   EditablePreview,
   useToast,
   Input,
-  HStack,
+  Box,
 } from '@chakra-ui/react'
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
 
@@ -73,16 +73,17 @@ export const EditableContract = ({
     )
   }
 
+  // FIXME: Preview 넣으면 UI 깨짐
   return (
     <Editable
       textAlign="center"
       defaultValue={nftContract}
       fontSize="xl"
-      isPreviewFocusable={false}
+      isPreviewFocusable={true}
       onSubmit={handleInputSubmit} //(nextValue: string) => setContractAddress(nextValue)
       submitOnBlur={false}
     >
-      <EditablePreview />
+      {/* <EditablePreview /> */} 
       <Input as={EditableInput} />
       <EditableControls />
     </Editable>

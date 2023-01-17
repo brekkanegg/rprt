@@ -26,7 +26,7 @@ export const Head = ({
 }): JSX.Element => {
   const router = useRouter()
   const meta: MetaProps = {
-    title: 'rprt-demo',
+    title: 'RPRT Demo',
     description: 'Buff system based on location in web3',
     image: `${WEBSITE_HOST_URL}/images/site-preview.png`,
     type: 'website',
