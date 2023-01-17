@@ -12,7 +12,15 @@ import { getCurrentPosition } from '../utils/getCurrentPosition'
 import { IPFS_BASE_URL, ipfs } from '../utils/ipfs'
 import { AddressString, NftControlProps } from '../types/custom'
 
-export const NftMinter = ({ address, contractAddress }: NftControlProps) => {
+export interface NftControlPropsExtend extends NftControlProps {
+  setNewMint: Function
+}
+
+export const NftMinter = ({
+  address,
+  contractAddress,
+  setNewMint,
+}: NftControlPropsExtend) => {
   const [hasNftUri, setHasNftUri] = useState(false)
   const nftUriRef = useRef('')
 
@@ -90,6 +98,7 @@ export const NftMinter = ({ address, contractAddress }: NftControlProps) => {
       // This will trigger the useEffect to run the `write()` function.
       setHasNftUri(true)
       console.log('nfturi: ', nftUriRef.current)
+      setNewMint(nftUriRef.current)
     } catch (error) {
       console.log('error', error)
       toast({
@@ -104,6 +113,7 @@ export const NftMinter = ({ address, contractAddress }: NftControlProps) => {
     if (hasNftUri && write) {
       write()
       setHasNftUri(false)
+      // Nft list Fetch 하기 위해서
     }
   }, [hasNftUri, write])
 

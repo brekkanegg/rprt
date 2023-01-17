@@ -36,6 +36,8 @@ const Home: NextPage = () => {
   const [hideLocationNft, setHideLocationNft] = useState(false)
   const [hideBuffNft, setHideBuffNft] = useState(false)
 
+  const [newMint, setNewMint] = useState('')
+
   //FIXME: Multiple chain support
   const LOCATION_NFT_CONTRACT_ADDRESS: AddressString = isLocalChain
     ? MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS //LOCAL_LOCATION_NFT_ADDRESS
@@ -53,7 +55,7 @@ const Home: NextPage = () => {
     }).then((ownedNfts) => {
       setNFTs(ownedNfts)
     })
-  }, [address, filterContract, NftMinter])
+  }, [address, filterContract, newMint])
 
   if (!isMounted) {
     return null
@@ -87,6 +89,7 @@ const Home: NextPage = () => {
           <NftMinter
             address={address}
             contractAddress={LOCATION_NFT_CONTRACT_ADDRESS}
+            setNewMint={setNewMint}
           />
         }
       </Box>
@@ -143,7 +146,7 @@ const Home: NextPage = () => {
               )
             })
           ) : (
-            <div>No NFTs found</div>
+            <Box>No NFTs found</Box>
           )}
         </SimpleGrid>
       </Box>
