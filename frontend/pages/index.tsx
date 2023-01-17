@@ -24,7 +24,7 @@ import { useIsMounted } from '../hooks/useIsMounted'
 import { NftMinter } from '../components/NftMinter'
 import { AddressString } from '../types/custom'
 import { NftCard } from '../components/NftCard'
-import { fetchNfts } from '../utils/fetchNfts'
+import { fetchNfts } from '../utils/fetchNfts2'
 
 const Home: NextPage = () => {
   const { isLocalChain } = useCheckLocalChain() //FIXME: Multiple chain support

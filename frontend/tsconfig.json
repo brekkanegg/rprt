@@ -20,7 +20,7 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/mynft.tsx",
-    "utils/fetchNfts.ts"
+    "utils/fetchNfts2.ts"
   ],
   "exclude": ["node_modules"]
 }
