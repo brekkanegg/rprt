@@ -256,9 +256,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
   return (
     <VStack shouldWrapChildren>
       <Text textAlign="center" my="2">
-        {/* ⌚ Time Radius (sec){' '}
-         */}
-        Give buff to all Location NFTs' owners minted in the past{' '}
+        Give buff to all Location NFT owners minted in the past{' '}
         <Input
           isDisabled={!address || isLoading}
           placeholder={`${timeRadius}`}
@@ -268,7 +266,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
         seconds
       </Text>
       <Text textAlign="center" my="2">
-        Give buff to all Location NFTs' owners minted within{' '}
+        Give buff to all Location NFT owners minted within{' '}
         <Input
           isDisabled={!address || isLoading}
           placeholder={`${distRadius}`}
