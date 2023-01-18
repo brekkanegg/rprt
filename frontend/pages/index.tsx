@@ -112,6 +112,10 @@ const Home: NextPage = () => {
         <SimpleGrid my="6" columns={[1, 1, 3]} gap="6">
           {NFTs ? (
             NFTs.filter((NFT: any) => {
+              // Hide NFTs with no image
+              if (!('image' in NFT.metadata)) {
+                return false
+              }
               if (
                 hideLocationNft &&
                 NFT.contractMetadata.name === 'LoCationToken'
