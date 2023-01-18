@@ -7,8 +7,6 @@ import {
   Button,
   Center,
   SimpleGrid,
-  RadioGroup,
-  Radio,
   CheckboxGroup,
   Checkbox,
   Stack,
@@ -22,16 +20,14 @@ import { Layout } from '../components/layout/Layout'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
 import { NftMinter } from '../components/NftMinter'
-import { AddressString } from '../types/custom'
 import { NftCard } from '../components/NftCard'
-import { fetchNfts } from '../utils/fetchNfts2'
+import { fetchNfts } from '../utils/fetchNfts'
 
 const Home: NextPage = () => {
   const { isLocalChain } = useCheckLocalChain() //FIXME: Multiple chain support
   const { address } = useAccount()
 
   const [NFTs, setNFTs] = useState<any>([])
-  const [filterContract, setFilterContract] = useState('') // FIXME: Only loc / only buff
 
   const [hideLocationNft, setHideLocationNft] = useState(false)
   const [hideBuffNft, setHideBuffNft] = useState(false)
@@ -39,23 +35,17 @@ const Home: NextPage = () => {
   const [newMint, setNewMint] = useState('')
 
   //FIXME: Multiple chain support
-  const LOCATION_NFT_CONTRACT_ADDRESS: AddressString = isLocalChain
+  const LOCATION_NFT_CONTRACT_ADDRESS: `0x${string}` = isLocalChain
     ? MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS //LOCAL_LOCATION_NFT_ADDRESS
     : MUMBAI_LOCATION_NFT_CONTRACT_ADDRESS
-  // const [locContract, setLocContract] = useState<AddressString>(
-  //   LOCATION_NFT_CONTRACT_ADDRESS
-  // )
 
   const { isMounted } = useIsMounted()
 
   useEffect(() => {
-    fetchNfts({
-      address,
-      contractAddress: filterContract,
-    }).then((ownedNfts) => {
+    fetchNfts(address).then((ownedNfts) => {
       setNFTs(ownedNfts)
     })
-  }, [address, filterContract, newMint])
+  }, [address, newMint])
 
   if (!isMounted) {
     return null

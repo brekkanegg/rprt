@@ -10,7 +10,7 @@ import { useIsMounted } from '../hooks/useIsMounted'
 import { generateTokenUriFromPosition } from '../utils/generateTokenUri'
 import { getCurrentPosition } from '../utils/getCurrentPosition'
 import { IPFS_BASE_URL, ipfs } from '../utils/ipfs'
-import { AddressString, NftControlProps } from '../types/custom'
+import { NftControlProps } from '../types/custom'
 
 interface NftControlPropsExtend extends NftControlProps {
   setNewMint: Function

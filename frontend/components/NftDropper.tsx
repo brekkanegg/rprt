@@ -141,8 +141,9 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
         const nftLatitude = nft.rawMetadata.attributes[0].value
         const nftLongitude = nft.rawMetadata.attributes[1].value
         const nftTimestamp = nft.rawMetadata.attributes[3].value
+        const nftEpochTime = new Date(nftTimestamp).getTime()
 
-        const timeDiff = (rightNow - nftTimestamp) / 1000 // in Seconds
+        const timeDiff = (rightNow - nftEpochTime) / 1000 // in Seconds
         if (timeDiff < timeRadius) {
           const distDiff = calcDistanceFromLatLonInMeters(
             position.coords.latitude,
@@ -240,7 +241,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
 
   return (
     <VStack shouldWrapChildren>
-      <Text textAlign="center" my="4" >
+      <Text textAlign="center" my="4">
         ⌚ Time Radius (sec){' '}
       </Text>
       <NumberInput

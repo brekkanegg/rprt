@@ -34,7 +34,7 @@ export const NftCard = ({
               color="blue.500"
               target="_blank"
               className="text-blue-700"
-              href={`https://mumbai.polgonscan.com/token/${address}`}
+              href={`https://mumbai.polygonscan.com/token/${address}`}
               rel="noopener noreferrer"
             >{`${address.slice(0, 3)}...${address.slice(
               address.length - 3
@@ -56,7 +56,7 @@ export const NftCard = ({
                 <Text noOfLines={1} className="mr-2 font-bold">
                   {attribute.trait_type}:
                 </Text>
-                <Text noOfLines={1} className="text-sm">
+                <Text noOfLines={[1, 2]} className="text-sm">
                   {attribute.value}
                 </Text>
               </Box>

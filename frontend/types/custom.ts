@@ -1,6 +1,6 @@
 export type AddressString = `0x${string}`
 
 export interface NftControlProps {
-  address?: AddressString | null
+  address?: `0x${string}` | null
   contractAddress: string
 }

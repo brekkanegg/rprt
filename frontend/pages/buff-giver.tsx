@@ -27,18 +27,13 @@ import { NftDropper } from '../components/NftDropper'
 const MyNFTs: NextPage = () => {
   const { isLocalChain } = useCheckLocalChain()
   const { address } = useAccount()
-  const [contractAddress, setContractAddress] = useState('')
 
   const updatedBuffContractRef = useRef(false)
-
-  const toast = useToast()
 
   const BUFF_NFT_CONTRACT_ADDRESS: string = isLocalChain
     ? MUMBAI_BUFF_NFT_CONTRACT_ADDRESS //LOCAL_BUFF_NFT_ADDRESS
     : MUMBAI_BUFF_NFT_CONTRACT_ADDRESS
   const [buffContract, setBuffContract] = useState(BUFF_NFT_CONTRACT_ADDRESS)
-
-  // const filterAddresses = ['']
 
   useEffect(() => {
     if (updatedBuffContractRef.current) return

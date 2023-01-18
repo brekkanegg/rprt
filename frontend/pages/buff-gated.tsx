@@ -17,8 +17,6 @@ import { Layout } from '../components/layout/Layout'
 import { useCheckLocalChain } from '../hooks/useCheckLocalChain'
 import { useIsMounted } from '../hooks/useIsMounted'
 
-// const GOERLI_CONTRACT_ADDRESS = '0x982659f8ce3988096A735044aD42445D6514ba7e'
-
 const TokenGated: NextPage = () => {
   const { address, isConnected } = useAccount()
 
@@ -96,7 +94,7 @@ const TokenGated: NextPage = () => {
     return (
       <Layout>
         <Heading as="h1" mb="8">
-          Buff Gated Page
+          Buff Gated
         </Heading>
         {sharedDescription}
         <Alert status="error">
@@ -114,7 +112,7 @@ const TokenGated: NextPage = () => {
     return (
       <Layout>
         <Heading as="h1" mb="8">
-          Buff Gated Page
+          Buff Gated
         </Heading>
         {sharedDescription}
         <Text mb="4" fontSize="lg">
@@ -132,7 +130,7 @@ const TokenGated: NextPage = () => {
   return (
     <Layout>
       <Heading as="h1" mb="8">
-        Buff Token Gated Page
+        Buff Gated
       </Heading>
       {sharedDescription}
       <Text mb="4" fontSize="lg">

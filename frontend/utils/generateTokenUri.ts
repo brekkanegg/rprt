@@ -23,6 +23,10 @@ const GMAP_APIKEY = 'AIzaSyCXjOn7hweLxfSwQ-IaVqLPNeAT4sCD76E'
 const GMAP_SIGNATURE = 'UPzNuHJpF82Ly0nADKuCwi2ErgU='
 
 export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
+  const formattedDate = new Date(data.timestamp).toString() //toUTCString
+  console.log(formattedDate)
+  // console.log(new Date(data.timestamp * 1000).toUTCString())
+
   const lat = data.coords.latitude
   const lon = data.coords.longitude
 
@@ -51,7 +55,7 @@ export const generateTokenUriFromPosition = (data: GeolocationPosition) => {
       },
       {
         trait_type: 'Timestamp',
-        value: data.timestamp,
+        value: formattedDate,
       },
     ],
   }
