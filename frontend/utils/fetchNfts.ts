@@ -23,6 +23,7 @@ export const fetchNfts = async (address?: `0x${string}`) => {
           (response) => response.data
         )
 
+        // Override
         nft.metadata = metadata
         nft.media[0].gateway = metadata.image
         nft.title = metadata.title

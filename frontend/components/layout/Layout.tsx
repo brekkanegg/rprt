@@ -34,7 +34,7 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
               </NextLink>
               <NextLink href="/buff-gated" passHref legacyBehavior>
                 <Link px="4" py="1">
-                  Buff Gated
+                  Buff Gated(WIP)
                 </Link>
               </NextLink>
             </Flex>
