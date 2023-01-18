@@ -18,15 +18,16 @@ export const fetchNfts = async (address?: `0x${string}`) => {
     for (let nft of data.ownedNfts) {
       // FIXME: Temporary Fe
       if (nft.error === 'IPFS gateway timed out') {
+        console.log('refetching...', nft)
         const metadata = await axios(nft.tokenUri.raw).then(
           (response) => response.data
         )
 
-        nft.rawMetadata = metadata
+        nft.metadata = metadata
         nft.media[0].gateway = metadata.image
         nft.title = metadata.title
         nft.description = metadata.description
-        nft.attributes = metadata.description
+        // nft.attributes = metadata.description
 
         validNfts.push(nft)
       } else {
