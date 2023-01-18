@@ -102,7 +102,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
     },
   })
 
-  const dropBuff = useCallback(async () => {
+  const dropBuff = async () => {
     const fetchImage = async () => {
       const response = await fetch(
         `https://api.unsplash.com/photos/random/?client_id=${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}`
@@ -127,6 +127,13 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
 
       const whitelist: string[] = []
       for (let nft of locationNfts) {
+        // Hard fix - refetching metadata
+        // console.log(nft)
+        if (nft.rawMetadata.attributes === undefined) {
+          console.log('no rawMetadata attributes', nft)
+          continue
+        }
+
         if (
           nft.metadataError &&
           nft.metadataError === 'IPFS gateway timed out'
@@ -136,12 +143,19 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
             (response) => response.data
           )
           nft.rawMetadata = metadata
+          // nft.metadata.attributes = metadata
         }
 
+        // const nftLatitude = nft.metadata.attributes[0].value
+        // const nftLongitude = nft.metadata.attributes[1].value
+        // const nftTimestamp = nft.metadata.attributes[3].value
         const nftLatitude = nft.rawMetadata.attributes[0].value
         const nftLongitude = nft.rawMetadata.attributes[1].value
         const nftTimestamp = nft.rawMetadata.attributes[3].value
+
         const nftEpochTime = new Date(nftTimestamp).getTime()
+        // console.log('\n1', nftTimestamp)
+        // console.log('\n2', new Date(nftEpochTime).toString())
 
         const timeDiff = (rightNow - nftEpochTime) / 1000 // in Seconds
         if (timeDiff < timeRadius) {
@@ -164,6 +178,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
                 owners[0],
                 '\nnft metadata: ',
                 nft.rawMetadata,
+                // nft.metadata.attributes,
                 '\nTime diff (sec): ',
                 timeDiff,
                 '\nDistance diff (meters): ',
@@ -226,7 +241,8 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
         isClosable: true,
       })
     }
-  }, [timeRadius, distRadius])
+  }
+  //, [timeRadius, distRadius])
 
   useEffect(() => {
     if (hasWhitelist && write) {
