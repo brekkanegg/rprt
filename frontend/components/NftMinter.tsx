@@ -130,7 +130,7 @@ export const NftMinter = ({
         onClick={mintLocation}
         isLoading={isLoading}
       >
-        {address ? 'Mint Location' : 'Please Connect Your Wallet'}
+        {address ? 'Mint' : 'Please Connect Your Wallet'}
       </Button>
     </Text>
   )

@@ -9,6 +9,7 @@ import {
   NumberDecrementStepper,
   VStack,
   useToast,
+  Input,
 } from '@chakra-ui/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -41,7 +42,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
   // const [hasNftUri, setHasNftUri] = useState(false)
   const nftUriRef = useRef(new Array<string>())
 
-  const [distRadius, setDistRadius] = useState(100)
+  const [distRadius, setDistRadius] = useState(1000)
   const [timeRadius, setTimeRadius] = useState(300)
 
   const { isMounted } = useIsMounted()
@@ -102,97 +103,95 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
     },
   })
 
-  const dropBuff = async () => {
-    const fetchImage = async () => {
-      const response = await fetch(
-        `https://api.unsplash.com/photos/random/?client_id=${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}`
-      )
+  const fetchImage = async () => {
+    const response = await fetch(
+      `https://api.unsplash.com/photos/random/?client_id=${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}`
+    )
 
-      if (!response.ok) {
-        throw Error('Error with fetch')
-      }
-
-      const data = await response.json()
-      return data
+    if (!response.ok) {
+      throw Error('Error with fetch')
     }
 
-    const repeatArray = (arr: string[], n: number) =>
-      [].concat(...Array(n).fill(arr))
+    const data = await response.json()
+    return data
+  }
 
-    const getBuffWhitelist = async (locationNfts: any) => {
-      const position: GeolocationPosition = await getCurrentPosition()
-      console.log('current position: ', position.coords)
+  const repeatArray = (arr: string[], n: number) =>
+    [].concat(...Array(n).fill(arr))
 
-      const rightNow = Date.now()
+  const getBuffWhitelist = async (locationNfts: any) => {
+    const position: GeolocationPosition = await getCurrentPosition()
+    console.log('current position: ', position.coords)
 
-      const whitelist: string[] = []
-      for (let nft of locationNfts) {
-        // Hard fix - refetching metadata
-        // console.log(nft)
-        if (nft.rawMetadata.attributes === undefined) {
-          console.log('no rawMetadata attributes', nft)
-          continue
-        }
+    const rightNow = Date.now()
 
-        if (
-          nft.metadataError &&
-          nft.metadataError === 'IPFS gateway timed out'
-        ) {
-          console.log('Refetching metadata...', nft)
-          const metadata = await axios(nft.tokenUri.raw).then(
-            (response) => response.data
+    const whitelist: string[] = []
+    for (let nft of locationNfts) {
+      // Hard fix - refetching metadata
+      // console.log(nft)
+
+      if (nft.rawMetadata.attributes === undefined) {
+        console.log('no rawMetadata attributes', nft)
+        continue
+      }
+
+      if (nft.metadataError && nft.metadataError === 'IPFS gateway timed out') {
+        console.log('Refetching metadata...', nft)
+        const metadata = await axios(nft.tokenUri.raw).then(
+          (response) => response.data
+        )
+        nft.rawMetadata = metadata
+        // nft.metadata.attributes = metadata
+      }
+
+      // const nftLatitude = nft.metadata.attributes[0].value
+      // const nftLongitude = nft.metadata.attributes[1].value
+      // const nftTimestamp = nft.metadata.attributes[3].value
+      const nftLatitude = nft.rawMetadata.attributes[0].value
+      const nftLongitude = nft.rawMetadata.attributes[1].value
+      const nftTimestamp = nft.rawMetadata.attributes[3].value
+
+      const nftEpochTime = new Date(nftTimestamp).getTime()
+      // console.log('\n1', nftTimestamp)
+      // console.log('\n2', new Date(nftEpochTime).toString())
+
+      const timeDiff = (rightNow - nftEpochTime) / 1000 // in Seconds
+      if (timeDiff < timeRadius) {
+        const distDiff = calcDistanceFromLatLonInMeters(
+          position.coords.latitude,
+          position.coords.longitude,
+          nftLatitude,
+          nftLongitude
+        )
+
+        if (distDiff < distRadius) {
+          const { owners } = await alchemy.nft.getOwnersForNft(
+            MUMBAI_LOCATION_NFT_ADDRESS,
+            nft.tokenId
           )
-          nft.rawMetadata = metadata
-          // nft.metadata.attributes = metadata
-        }
-
-        // const nftLatitude = nft.metadata.attributes[0].value
-        // const nftLongitude = nft.metadata.attributes[1].value
-        // const nftTimestamp = nft.metadata.attributes[3].value
-        const nftLatitude = nft.rawMetadata.attributes[0].value
-        const nftLongitude = nft.rawMetadata.attributes[1].value
-        const nftTimestamp = nft.rawMetadata.attributes[3].value
-
-        const nftEpochTime = new Date(nftTimestamp).getTime()
-        // console.log('\n1', nftTimestamp)
-        // console.log('\n2', new Date(nftEpochTime).toString())
-
-        const timeDiff = (rightNow - nftEpochTime) / 1000 // in Seconds
-        if (timeDiff < timeRadius) {
-          const distDiff = calcDistanceFromLatLonInMeters(
-            position.coords.latitude,
-            position.coords.longitude,
-            nftLatitude,
-            nftLongitude
-          )
-
-          if (distDiff < distRadius) {
-            const { owners } = await alchemy.nft.getOwnersForNft(
-              MUMBAI_LOCATION_NFT_ADDRESS,
-              nft.tokenId
+          // Only one owner exists since NFT is ERC-721 standard for now.
+          if (!whitelist.includes(owners[0])) {
+            console.log(
+              'Buff target is: ',
+              owners[0],
+              '\nnft metadata: ',
+              nft.rawMetadata,
+              // nft.metadata.attributes,
+              '\nTime diff (sec): ',
+              timeDiff,
+              '\nDistance diff (meters): ',
+              distDiff
             )
-            // Only one owner exists since NFT is ERC-721 standard for now.
-            if (!whitelist.includes(owners[0])) {
-              console.log(
-                'Buff target is: ',
-                owners[0],
-                '\nnft metadata: ',
-                nft.rawMetadata,
-                // nft.metadata.attributes,
-                '\nTime diff (sec): ',
-                timeDiff,
-                '\nDistance diff (meters): ',
-                distDiff
-              )
-              whitelist.push(String(owners[0]))
-            }
+            whitelist.push(String(owners[0]))
           }
         }
       }
-
-      return whitelist
     }
 
+    return whitelist
+  }
+
+  const dropBuff = useCallback(async () => {
     try {
       const { nfts } = await alchemy.nft.getNftsForContract(
         MUMBAI_LOCATION_NFT_ADDRESS,
@@ -241,8 +240,7 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
         isClosable: true,
       })
     }
-  }
-  //, [timeRadius, distRadius])
+  }, [timeRadius, distRadius])
 
   useEffect(() => {
     if (hasWhitelist && write) {
@@ -257,47 +255,28 @@ export const NftDropper = ({ address, contractAddress }: NftControlProps) => {
 
   return (
     <VStack shouldWrapChildren>
-      <Text textAlign="center" my="4">
-        ⌚ Time Radius (sec){' '}
+      <Text textAlign="center" my="2">
+        {/* ⌚ Time Radius (sec){' '}
+         */}
+        Give buff to all Location NFTs' owners minted in the past{' '}
+        <Input
+          isDisabled={!address || isLoading}
+          placeholder={`${timeRadius}`}
+          maxW={20}
+          onChange={(event) => setTimeRadius(Number(event.target.value))}
+        />
+        seconds
       </Text>
-      <NumberInput
-        // value={timeRadius}
-        isDisabled={!address || isLoading}
-        onChange={(value) => setTimeRadius(Number(value))}
-        size="md"
-        maxW={40}
-        defaultValue={300}
-        // min={100}
-        step={300}
-        min={0}
-      >
-        <NumberInputField />
-        <NumberInputStepper>
-          <NumberIncrementStepper />
-          <NumberDecrementStepper />
-        </NumberInputStepper>
-      </NumberInput>
-      <Text textAlign="center" my="4">
-        🌍 Distance Radius (meter){' '}
+      <Text textAlign="center" my="2">
+        Give buff to all Location NFTs' owners minted within{' '}
+        <Input
+          isDisabled={!address || isLoading}
+          placeholder={`${distRadius}`}
+          maxW={20}
+          onChange={(event) => setDistRadius(Number(event.target.value))}
+        />
+        meters
       </Text>
-      <NumberInput
-        // value={timeRadius}
-
-        isDisabled={!address || isLoading}
-        onChange={(value) => setDistRadius(Number(value))}
-        size="md"
-        maxW={40}
-        defaultValue={1000}
-        // min={100}
-        step={1000}
-        min={0}
-      >
-        <NumberInputField />
-        <NumberInputStepper>
-          <NumberIncrementStepper />
-          <NumberDecrementStepper />
-        </NumberInputStepper>
-      </NumberInput>
       <Text textAlign="center" mt="8">
         <Button
           colorScheme="teal"

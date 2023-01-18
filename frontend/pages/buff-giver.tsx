@@ -67,10 +67,10 @@ const MyNFTs: NextPage = () => {
       </Button>
       <Box p="8" mt="4" bg="gray.100">
         <Text fontSize="xl" textAlign="center">
-          Buff NFT Contract:
+          2. Define your buff condition and give buff
         </Text>
         <Text fontSize="xl" textAlign="center">
-          {buffContract}
+        Buff NFT Contract: {buffContract}
         </Text>
         <EditableContract
           nftContract={buffContract}

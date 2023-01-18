@@ -69,11 +69,11 @@ const Home: NextPage = () => {
       </Button>
       <Box p="8" mt="4" bg="gray.100">
         <Text fontSize="xl" textAlign="center">
-          Location NFT Contract:
+          1. Mint your Location NFT
         </Text>
-        <Text fontSize="xl" textAlign="center">
-          {LOCATION_NFT_CONTRACT_ADDRESS}
-        </Text>
+        {/* <Text fontSize="xl" textAlign="center">
+          Location NFT Contract: {LOCATION_NFT_CONTRACT_ADDRESS}
+        </Text> */}
         <Divider my="4" borderColor="gray.400" />
         {
           <NftMinter
@@ -86,7 +86,9 @@ const Home: NextPage = () => {
       <Divider my="4" borderColor="gray.400" />
       <Box p="8" mt="4" bg="gray.100">
         <Center mb="4" fontSize="xl">
-          <Text>My NFTs:</Text>
+          <Text>3. Check your NFTs:</Text>
+        </Center>
+        <Center mb="4" fontSize="xl">
           <CheckboxGroup>
             <Stack mx="8" spacing={5} direction="row">
               <Checkbox
@@ -113,9 +115,9 @@ const Home: NextPage = () => {
           {NFTs ? (
             NFTs.filter((NFT: any) => {
               // Hide NFTs with no image
-              if (!('image' in NFT.metadata)) {
-                return false
-              }
+              // if (!('image' in NFT.metadata)) {
+              //   return false
+              // }
               if (
                 hideLocationNft &&
                 NFT.contractMetadata.name === 'LoCationToken'
